@@ -152,4 +152,19 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# Eclipse
+.project
+.classpath
+.settings/
+bin/
+
+# IntelliJ
+.idea
+*.ipr
+*.iml
+*.iws
+
+# NetBeans
+nb-configuration.xml
+
 # End of https://www.toptal.com/developers/gitignore/api/flutter,dart,windows,macos
