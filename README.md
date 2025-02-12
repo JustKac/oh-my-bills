@@ -60,7 +60,7 @@ oh-my-bills/
 
 1. Clone o repositório:
    ```bash
-   git clone https://github.com/seu-usuario/oh-my-bills.git
+   git clone https://github.com/JustKac/oh-my-bills.git
    cd oh-my-bills
    ```
 
