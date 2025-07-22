@@ -30,7 +30,7 @@ Um aplicativo de controle financeiro pessoal e **offline** para ajudar você a g
 
 ## 🛠️ Tecnologias Utilizadas
 
-- **Frontend**: Flutter (mobile e web).
+- **App**: Flutter (mobile).
 - **Backend**: Java com Quarkus (API REST).
 - **Banco de Dados**: SQLite (armazenamento local).
 - **Ferramentas**: Git, GitHub, Figma (para prototipagem).
@@ -42,7 +42,7 @@ Um aplicativo de controle financeiro pessoal e **offline** para ajudar você a g
 ```plaintext
 oh-my-bills/
 ├── backend/              # Código do backend (Java/Quarkus)
-├── frontend/             # Código do frontend (Flutter)
+├── app/                  # Código do app (Flutter)
 ├── docs/                 # Documentação do projeto
 └── README.md             # Este arquivo
 ```
@@ -53,7 +53,7 @@ oh-my-bills/
 
 ### Pré-requisitos
 - Flutter SDK instalado.
-- Java JDK 17+ instalado.
+- Java JDK 21+ instalado.
 - SQLite (embutido no Flutter ou no Quarkus).
 
 ### Passos para Executar
