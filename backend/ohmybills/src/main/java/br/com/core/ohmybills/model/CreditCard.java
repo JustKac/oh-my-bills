@@ -21,8 +21,8 @@ public class CreditCard extends AbstractEntity {
     @Column(name = "best_shopping_day")
     private LocalDate bestShoppingDay;
 
-    @Column(name = "cvv")
-    private String cvv;
+    @Column(name = "name")
+    private String name;
 
     @OneToMany(mappedBy = "creditCard", fetch = FetchType.LAZY)
     private List<Invoice> invoices;
@@ -51,12 +51,12 @@ public class CreditCard extends AbstractEntity {
         this.bestShoppingDay = bestShoppingDay;
     }
 
-    public String getCvv() {
-        return cvv;
+    public String getName() {
+        return name;
     }
 
-    public void setCvv(String cvv) {
-        this.cvv = cvv;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public List<Invoice> getInvoices() {
