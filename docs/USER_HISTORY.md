@@ -1,6 +1,3 @@
-
----
-
 ## **Histórias de Usuário**
 
 ### 1. Autenticação
@@ -36,7 +33,3 @@
 - **Como usuário**, quero editar meu nome, e-mail e foto, **para** manter meu perfil atualizado.
 - **Como usuário**, quero alternar entre tema claro e escuro, **para** adaptar a interface ao meu gosto.
 - **Como usuário**, quero excluir minha conta e todos os meus dados, **para** encerrar meu uso do sistema.
-
----
-
-Se quiser, posso já **transformar essas histórias em backlog detalhado com tarefas e sprints sugeridos** para facilitar seu planejamento ágil. Isso já deixa pronto para rodar no Trello ou Jira. Quer que eu siga assim?
