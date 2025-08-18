@@ -14,4 +14,5 @@ public class IncomeService extends GenericServiceImpl<Income, UUID, IncomeReposi
         super(repository);
     }
 
+    
 }
