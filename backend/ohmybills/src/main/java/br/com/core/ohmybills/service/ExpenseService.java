@@ -1,17 +1,18 @@
 package br.com.core.ohmybills.service;
 
+import br.com.core.ohmybills.dto.ExpenseDTO;
+import org.springframework.data.domain.Page;
+
+import java.util.List;
 import java.util.UUID;
 
-import org.springframework.stereotype.Service;
+public interface ExpenseService {
 
-import br.com.core.ohmybills.model.Expense;
-import br.com.core.ohmybills.repository.ExpenseRepository;
-
-@Service
-public class ExpenseService extends GenericServiceImpl<Expense, UUID, ExpenseRepository> {
-
-    public ExpenseService(ExpenseRepository repository) {
-        super(repository);
-    }
+    ExpenseDTO findExpenseById(UUID expenseId);
+    void addExpense(ExpenseDTO expenseDto);
+    ExpenseDTO updateExpense(ExpenseDTO expenseDto);
+    void deleteExpenseById(UUID expenseId);
+    Page<ExpenseDTO> listExpenses(int page, int size);
+    void importExpenses(List<ExpenseDTO> expenses);
 
 }

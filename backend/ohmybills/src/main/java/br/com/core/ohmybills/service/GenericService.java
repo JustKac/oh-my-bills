@@ -1,5 +1,8 @@
 package br.com.core.ohmybills.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 public interface GenericService<T, ID> {
 
     T save(T entity);
@@ -8,7 +11,7 @@ public interface GenericService<T, ID> {
 
     void deleteById(ID id);
 
-    Iterable<T> findAll();
+    Page<T> findAll(Pageable pageable);
 
     boolean existsById(ID id);
 
