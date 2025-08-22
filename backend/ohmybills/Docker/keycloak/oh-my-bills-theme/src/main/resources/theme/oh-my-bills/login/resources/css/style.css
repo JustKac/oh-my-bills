@@ -1,0 +1,111 @@
+/* Paleta Oh My Bills */
+:root{
+  --omb-green: #16a34a;        /* verde principal */
+  --omb-green-dark: #0f8a3e;
+  --omb-mint: #dcfce7;         /* destaque leve */
+  --omb-gray-900: #0f172a;     /* texto forte */
+  --omb-gray-600: #475569;     /* texto médio */
+  --omb-gray-200: #e5e7eb;     /* bordas */
+  --omb-error: #dc2626;        /* erro */
+  --omb-bg: #f8fafc;           /* fundo */
+  --omb-white:#ffffff;
+}
+
+body, html {
+  background: var(--omb-bg);
+  color: var(--omb-gray-900);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+.omb-card {
+  background: var(--omb-white);
+  border: 1px solid var(--omb-gray-200);
+  border-radius: 16px;
+  padding: 28px;
+  max-width: 440px;
+  margin: 32px auto;
+  box-shadow: 0 6px 24px rgba(2,6,23,.06);
+}
+
+.omb-logo {
+  display: block;
+  width: 160px;
+  margin: 8px auto 16px;
+}
+
+.omb-title {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.omb-tagline {
+  text-align: center;
+  font-size: 14px;
+  color: var(--omb-gray-600);
+  margin-bottom: 20px;
+}
+
+.kc-input, .kc-select, .kc-textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--omb-gray-200);
+  background: var(--omb-white);
+  outline: none;
+  transition: border-color .2s ease;
+  margin-bottom: 12px;
+}
+.kc-input:focus { border-color: var(--omb-green); }
+
+.omb-btn {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--omb-green);
+  border: none;
+  color: var(--omb-white);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .2s ease, transform .02s linear;
+}
+.omb-btn:hover { background: var(--omb-green-dark); }
+.omb-btn:active { transform: translateY(1px); }
+
+.omb-link, .omb-link:visited {
+  color: var(--omb-green-dark);
+  text-decoration: none;
+  font-weight: 600;
+}
+.omb-link:hover { text-decoration: underline; }
+
+.kc-feedback-text {
+  margin: 8px 0 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+}
+.kc-feedback-error {
+  background: #fee2e2;
+  color: var(--omb-error);
+  border: 1px solid #fecaca;
+}
+.kc-feedback-info {
+  background: var(--omb-mint);
+  color: var(--omb-gray-900);
+  border: 1px solid #bbf7d0;
+}
+
+.omb-row {
+  display: flex;
+  gap: 10px;
+}
+.omb-row > * { flex: 1; }
+
+.omb-footer {
+  text-align: center;
+  color: var(--omb-gray-600);
+  font-size: 12px;
+  margin-top: 16px;
+}
