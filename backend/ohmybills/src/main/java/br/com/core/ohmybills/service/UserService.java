@@ -7,6 +7,5 @@ import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2Aut
 
 public interface UserService {
 
-    UserDTO getMe(Authentication auth,
-                  @RegisteredOAuth2AuthorizedClient(value = "keycloak") OAuth2AuthorizedClient client);
+    UserDTO getMe(Authentication auth, OAuth2AuthorizedClient client);
 }
