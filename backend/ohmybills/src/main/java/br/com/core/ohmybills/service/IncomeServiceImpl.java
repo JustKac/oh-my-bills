@@ -4,7 +4,8 @@ import java.util.List;
 import java.util.UUID;
 
 import br.com.core.ohmybills.dto.IncomeDTO;
-import org.springframework.data.domain.Page;
+import br.com.core.ohmybills.dto.PageResponseDTO;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import br.com.core.ohmybills.model.Income;
@@ -18,32 +19,85 @@ public class IncomeServiceImpl extends GenericServiceImpl<Income, UUID, IncomeRe
     }
 
     @Override
-    public IncomeDTO findExpenseById(UUID incomeId) {
-        return null;
+    public IncomeDTO findIncomeById(UUID incomeId) {
+        Income incomeFound = findById(incomeId);
+        return new IncomeDTO(
+                incomeFound.getId(),
+                incomeFound.getDescription(),
+                incomeFound.getFirstPayDate(),
+                incomeFound.getAmount(),
+                incomeFound.getInstallments(),
+                incomeFound.getIsRecurring()
+        );
     }
 
     @Override
-    public void addExpense(IncomeDTO incomeDTO) {
+    public void addIncome(IncomeDTO incomeDTO) {
+        save(new Income()
+                .setDescription(incomeDTO.description())
+                .setFirstPayDate(incomeDTO.firstPayDate())
+                .setAmount(incomeDTO.amount())
+                .setInstallments(incomeDTO.installments())
+                .setIsRecurring(incomeDTO.isRecurring())
+        );
+    }
+
+    @Override
+    public IncomeDTO updateIncome(IncomeDTO incomeDTO) {
+        Income incomeToUpdate = findById(incomeDTO.incomeId());
+        incomeToUpdate.setDescription(incomeDTO.description())
+                .setFirstPayDate(incomeDTO.firstPayDate())
+                .setAmount(incomeDTO.amount())
+                .setInstallments(incomeDTO.installments())
+                .setIsRecurring(incomeDTO.isRecurring());
+
+        save(incomeToUpdate);
+        return new IncomeDTO(
+                incomeToUpdate.getId(),
+                incomeToUpdate.getDescription(),
+                incomeToUpdate.getFirstPayDate(),
+                incomeToUpdate.getAmount(),
+                incomeToUpdate.getInstallments(),
+                incomeToUpdate.getIsRecurring()
+        );
+    }
+
+    @Override
+    public void deleteIncomeById(UUID incomeId) {
+        deleteById(incomeId);
+    }
+
+    @Override
+    public PageResponseDTO<IncomeDTO> listIncomes(int page, int size) {
+
+        var result = repository.findAll(PageRequest.of(page, size));
+        return new PageResponseDTO<IncomeDTO>(
+                result.getContent().stream().map(income -> new IncomeDTO(
+                        income.getId(),
+                        income.getDescription(),
+                        income.getFirstPayDate(),
+                        income.getAmount(),
+                        income.getInstallments(),
+                        income.getIsRecurring()
+                )).toList(),
+                result.getNumber(),
+                result.getSize(),
+                result.getTotalElements(),
+                result.getTotalPages(),
+                result.isLast()
+        );
 
     }
 
     @Override
-    public IncomeDTO updateExpense(IncomeDTO incomeDTO) {
-        return null;
-    }
-
-    @Override
-    public void deleteExpenseById(UUID incomeId) {
-
-    }
-
-    @Override
-    public Page<IncomeDTO> listExpenses(int page, int size) {
-        return null;
-    }
-
-    @Override
-    public void importExpenses(List<IncomeDTO> incomes) {
-
+    public void importIncomes(List<IncomeDTO> incomes) {
+        saveAll(incomes.stream().map(incomeDTO ->
+            new Income()
+                .setDescription(incomeDTO.description())
+                .setFirstPayDate(incomeDTO.firstPayDate())
+                .setAmount(incomeDTO.amount())
+                .setInstallments(incomeDTO.installments())
+                .setIsRecurring(incomeDTO.isRecurring())
+        ).toList());
     }
 }
