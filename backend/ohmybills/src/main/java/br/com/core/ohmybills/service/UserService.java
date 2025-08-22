@@ -1,17 +1,12 @@
 package br.com.core.ohmybills.service;
 
-import java.util.UUID;
+import br.com.core.ohmybills.dto.UserDTO;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
 
-import org.springframework.stereotype.Service;
+public interface UserService {
 
-import br.com.core.ohmybills.model.User;
-import br.com.core.ohmybills.repository.UserRepository;
-
-@Service
-public class UserService extends GenericServiceImpl<User, UUID, UserRepository> {
-
-    public UserService(UserRepository repository) {
-        super(repository);
-    }
-
+    UserDTO getMe(Authentication auth,
+                  @RegisteredOAuth2AuthorizedClient(value = "keycloak") OAuth2AuthorizedClient client);
 }
