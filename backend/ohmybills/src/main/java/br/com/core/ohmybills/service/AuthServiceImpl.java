@@ -1,7 +1,7 @@
 package br.com.core.ohmybills.service;
 
-import br.com.core.ohmybills.dto.AuthTokenDTO;
 import br.com.core.ohmybills.dto.AuthPrincipalDTO;
+import br.com.core.ohmybills.dto.AuthTokenDTO;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -9,6 +9,7 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.time.Instant;
 import java.util.Map;
@@ -19,15 +20,25 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ResponseEntity<Void> buildLoginRedirect() {
+        String location = ServletUriComponentsBuilder
+                .fromCurrentContextPath() // inclui /api
+                .path("/oauth2/authorization/keycloak")
+                .build()
+                .toUriString();
         return ResponseEntity.status(302)
-                .header(HttpHeaders.LOCATION, "/oauth2/authorization/keycloak")
+                .header(HttpHeaders.LOCATION, location)
                 .build();
     }
 
     @Override
     public ResponseEntity<Void> buildLogoutRedirect() {
+        String location = ServletUriComponentsBuilder
+                .fromCurrentContextPath() // inclui /api
+                .path("/logout")
+                .build()
+                .toUriString();
         return ResponseEntity.status(302)
-                .header(HttpHeaders.LOCATION, "/logout")
+                .header(HttpHeaders.LOCATION, location)
                 .build();
     }
 
@@ -35,14 +46,8 @@ public class AuthServiceImpl implements AuthService {
     public AuthTokenDTO getCurrentToken(Authentication auth, OAuth2AuthorizedClient client) {
         if (auth instanceof JwtAuthenticationToken jwtAuth) {
             var jwt = jwtAuth.getToken();
-            return new AuthTokenDTO(
-                    jwt.getTokenValue(),
-                    jwt.getExpiresAt(),
-                    null,
-                    null
-            );
+            return new AuthTokenDTO(jwt.getTokenValue(), jwt.getExpiresAt(), null, null);
         }
-
         if (client != null && client.getAccessToken() != null) {
             String accessToken = client.getAccessToken().getTokenValue();
             Instant accessTokenExpiresAt = client.getAccessToken().getExpiresAt();
@@ -50,7 +55,6 @@ public class AuthServiceImpl implements AuthService {
             Instant refreshExpiresAt = client.getRefreshToken() != null ? client.getRefreshToken().getExpiresAt() : null;
             return new AuthTokenDTO(accessToken, accessTokenExpiresAt, refreshIssuedAt, refreshExpiresAt);
         }
-
         throw new IllegalStateException("Nenhum token disponível para o contexto atual.");
     }
 
@@ -59,7 +63,6 @@ public class AuthServiceImpl implements AuthService {
         if (auth == null || !auth.isAuthenticated()) {
             throw new IllegalStateException("Requisição não autenticada.");
         }
-
         String sub;
         String email;
         String name;
@@ -81,7 +84,6 @@ public class AuthServiceImpl implements AuthService {
         if (sub == null || sub.isBlank()) {
             throw new IllegalStateException("Keycloak 'sub' ausente no token.");
         }
-
         return new AuthPrincipalDTO(parseUuid(sub), email, name);
     }
 
