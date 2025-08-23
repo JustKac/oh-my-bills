@@ -50,7 +50,7 @@ RUN chown springuser:spring app.jar
 USER springuser
 
 # Expõe a porta padrão do Spring Boot
-EXPOSE 8080
+EXPOSE 8090
 
 # Comando para iniciar a aplicação
 # O formato 'exec' (com colchetes) é preferível pois o processo da JVM se torna o PID 1,
