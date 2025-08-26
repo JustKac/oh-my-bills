@@ -54,7 +54,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").authenticated()
                         .anyRequest().authenticated()
                 )
-                .oauth2Login(Customizer.withDefaults())
+                .oauth2Login(oauth -> oauth.defaultSuccessUrl("/auth/token", true))
                 .oauth2ResourceServer(resource -> resource
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
                 )

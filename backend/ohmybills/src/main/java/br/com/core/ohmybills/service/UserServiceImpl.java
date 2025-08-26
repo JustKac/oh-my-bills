@@ -1,11 +1,9 @@
 package br.com.core.ohmybills.service;
 
-import br.com.core.ohmybills.dto.AuthPrincipalDTO;
 import br.com.core.ohmybills.dto.UserDTO;
 import br.com.core.ohmybills.model.User;
 import br.com.core.ohmybills.repository.UserRepository;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,29 +13,25 @@ import java.util.UUID;
 @Service
 public class UserServiceImpl extends GenericServiceImpl<User, UUID, UserRepository> implements UserService {
 
-    private final AuthService authService;
-
-    public UserServiceImpl(UserRepository repository, AuthService authService) {
+    public UserServiceImpl(UserRepository repository) {
         super(repository);
-        this.authService = authService;
     }
 
     @Override
     @Transactional
-    public UserDTO getMe(Authentication auth, OAuth2AuthorizedClient client) {
-        AuthPrincipalDTO principal = authService.resolvePrincipal(auth, client);
+    public UserDTO getMe(UUID userId, UUID keycloakId) {
+        User userFound = repository.findByIdAndKeycloakId(userId, keycloakId).orElseThrow(EntityNotFoundException::new);
+        return toDTO(userFound);
+    }
 
-        UUID keycloakId = principal.keycloakId();
-        String email = principal.email();
-        String name = principal.name();
+    @Override
+    public UUID resolveOrCreateUserIdBySub(UUID keycloakId, String email, String name) {
 
-        // 1) Busca por keycloakId
         Optional<User> existingByKc = repository.findByKeycloakId(keycloakId);
         if (existingByKc.isPresent()) {
-            return toDTO(existingByKc.get());
+            return existingByKc.get().getId();
         }
 
-        // 2) Se não achou, tenta por e‑mail para evitar violar a unicidade
         if (email != null && !email.isBlank()) {
             Optional<User> existingByEmail = repository.findByEmail(email);
             if (existingByEmail.isPresent()) {
@@ -48,18 +42,15 @@ public class UserServiceImpl extends GenericServiceImpl<User, UUID, UserReposito
                 if ((u.getName() == null || u.getName().isBlank()) && name != null) {
                     u.setName(name);
                 }
-                return toDTO(repository.save(u));
+                return repository.save(u).getId();
             }
         }
 
-        // 3) Cria novo usuário
         User user = new User();
         user.setKeycloakId(keycloakId);
         user.setEmail(email);
         user.setName(name);
-        User saved = repository.save(user);
-
-        return toDTO(saved);
+        return repository.save(user).getId();
     }
 
     private UserDTO toDTO(User u) {

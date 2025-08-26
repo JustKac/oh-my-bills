@@ -1,11 +1,10 @@
 package br.com.core.ohmybills.service;
 
 import br.com.core.ohmybills.dto.UserDTO;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
-import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
+
+import java.util.UUID;
 
 public interface UserService {
-
-    UserDTO getMe(Authentication auth, OAuth2AuthorizedClient client);
+    UserDTO getMe(UUID userId, UUID keycloakId);
+    UUID resolveOrCreateUserIdBySub(UUID keycloakId, String email, String name);
 }
