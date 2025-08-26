@@ -28,7 +28,7 @@ public abstract class GenericServiceImpl<T, ID, R extends JpaRepository<T, ID>> 
 
     @Override
     public T findById(ID id) {
-        return repository.findById(id).orElseThrow((EntityNotFoundException::new));
+        return repository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
     @Override

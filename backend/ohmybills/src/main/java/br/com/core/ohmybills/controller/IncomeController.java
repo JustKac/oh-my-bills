@@ -2,13 +2,14 @@ package br.com.core.ohmybills.controller;
 
 import br.com.core.ohmybills.dto.IncomeDTO;
 import br.com.core.ohmybills.dto.PageResponseDTO;
+import br.com.core.ohmybills.security.CurrentUser;
+import br.com.core.ohmybills.security.UserContext;
 import br.com.core.ohmybills.service.IncomeService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,27 +25,28 @@ public class IncomeController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
-    public PageResponseDTO<IncomeDTO> list(@RequestParam(defaultValue = "0") int page,
+    public PageResponseDTO<IncomeDTO> list(@CurrentUser UserContext user,
+                                           @RequestParam(defaultValue = "0") int page,
                                            @RequestParam(defaultValue = "20") int size) {
-        return incomeService.listIncomes(page, size);
+        return incomeService.listIncomes(user.userId(), page, size);
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
-    public IncomeDTO getById(@PathVariable UUID id) {
-        return incomeService.findIncomeById(id);
+    public IncomeDTO getById(@CurrentUser UserContext user, @PathVariable UUID id) {
+        return incomeService.findIncomeById(user.userId(), id);
     }
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
-    public ResponseEntity<Void> create(@RequestBody @Valid IncomeDTO incomeDTO) {
-        incomeService.addIncome(incomeDTO);
+    public ResponseEntity<Void> create(@CurrentUser UserContext user, @RequestBody @Valid IncomeDTO incomeDTO) {
+        incomeService.addIncome(user.userId(), incomeDTO);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
-    public IncomeDTO update(@PathVariable UUID id, @RequestBody @Valid IncomeDTO incomeDTO) {
+    public IncomeDTO update(@CurrentUser UserContext user, @PathVariable UUID id, @RequestBody @Valid IncomeDTO incomeDTO) {
         var toUpdate = new IncomeDTO(
                 id,
                 incomeDTO.description(),
@@ -53,20 +55,20 @@ public class IncomeController {
                 incomeDTO.installments(),
                 incomeDTO.isRecurring()
         );
-        return incomeService.updateIncome(toUpdate);
+        return incomeService.updateIncome(user.userId(), toUpdate);
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        incomeService.deleteIncomeById(id);
+    public ResponseEntity<Void> delete(@CurrentUser UserContext user, @PathVariable UUID id) {
+        incomeService.deleteIncomeById(user.userId(), id);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/import")
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
-    public ResponseEntity<Void> bulkImport(@RequestBody @Valid List<IncomeDTO> incomes) {
-        incomeService.importIncomes(incomes);
+    public ResponseEntity<Void> bulkImport(@CurrentUser UserContext user, @RequestBody @Valid List<IncomeDTO> incomes) {
+        incomeService.importIncomes(user.userId(), incomes);
         return ResponseEntity.accepted().build();
     }
 }
