@@ -76,7 +76,6 @@ public class IncomeServiceImpl extends GenericServiceImpl<Income, UUID, IncomeRe
 
     @Override
     public PageResponseDTO<IncomeDTO> listIncomes(UUID userId, int page, int size) {
-
         var result = repository.findAllByUserId(userId, PageRequest.of(page, size));
         return new PageResponseDTO<IncomeDTO>(
                 result.getContent().stream().map(income -> new IncomeDTO(

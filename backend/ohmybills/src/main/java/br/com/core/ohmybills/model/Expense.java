@@ -48,72 +48,81 @@ public class Expense extends AbstractEntity{
         return description;
     }
 
-    public void setDescription(String description) {
+    public Expense setDescription(String description) {
         this.description = description;
+        return this;
     }
 
     public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(BigDecimal amount) {
+    public Expense setAmount(BigDecimal amount) {
         this.amount = amount;
+        return this;
     }
 
     public LocalDate getFirstPayDate() {
         return firstPayDate;
     }
 
-    public void setFirstPayDate(LocalDate firstPayDate) {
+    public Expense setFirstPayDate(LocalDate firstPayDate) {
         this.firstPayDate = firstPayDate;
+        return this;
     }
 
     public Boolean getIsRecurring() {
         return isRecurring;
     }
 
-    public void setIsRecurring(Boolean isRecurring) {
+    public Expense setIsRecurring(Boolean isRecurring) {
         this.isRecurring = isRecurring;
+        return this;
     }
 
     public Boolean getIsAchived() {
         return isAchived;
     }
 
-    public void setIsAchived(Boolean isAchived) {
+    public Expense setIsAchived(Boolean isAchived) {
         this.isAchived = isAchived;
+        return this;
     }
 
     public Integer getInstallments() {
         return installments;
     }
 
-    public void setInstallments(Integer installments) {
+    public Expense setInstallments(Integer installments) {
         this.installments = installments;
+        return this;
     }
 
     public User getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public Expense setUser(User user) {
         this.user = user;
+        return this;
     }
 
     public Invoice getInvoice() {
         return invoice;
     }
 
-    public void setInvoice(Invoice invoice) {
+    public Expense setInvoice(Invoice invoice) {
         this.invoice = invoice;
+        return this;
     }
 
     public PersonTag getPersonTag() {
         return personTag;
     }
 
-    public void setPersonTag(PersonTag personTag) {
+    public Expense setPersonTag(PersonTag personTag) {
         this.personTag = personTag;
+        return this;
     }
 
 }
