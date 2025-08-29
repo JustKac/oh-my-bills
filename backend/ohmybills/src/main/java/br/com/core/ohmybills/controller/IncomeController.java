@@ -44,18 +44,10 @@ public class IncomeController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{id}")
+    @PutMapping
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
-    public IncomeDTO update(@CurrentUser UserContext user, @PathVariable UUID id, @RequestBody @Valid IncomeDTO incomeDTO) {
-        var toUpdate = new IncomeDTO(
-                id,
-                incomeDTO.description(),
-                incomeDTO.firstPayDate(),
-                incomeDTO.amount(),
-                incomeDTO.installments(),
-                incomeDTO.isRecurring()
-        );
-        return incomeService.updateIncome(user.userId(), toUpdate);
+    public IncomeDTO update(@CurrentUser UserContext user, @RequestBody @Valid IncomeDTO incomeDTO) {
+        return incomeService.updateIncome(user.userId(), incomeDTO);
     }
 
     @DeleteMapping("/{id}")

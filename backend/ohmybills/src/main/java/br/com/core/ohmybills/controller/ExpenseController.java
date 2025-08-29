@@ -44,13 +44,10 @@ public class ExpenseController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{id}")
+    @PutMapping
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
-    public ExpenseDTO update(@CurrentUser UserContext user, @PathVariable UUID id, @RequestBody @Valid ExpenseDTO expenseDTO) {
-        var toUpdate = new ExpenseDTO(id, expenseDTO.description(), expenseDTO.firstPayDate(),
-                expenseDTO.amount(), expenseDTO.installments(), expenseDTO.isRecurring()
-        );
-        return expenseService.updateExpense(user.userId(), toUpdate);
+    public ExpenseDTO update(@CurrentUser UserContext user, @RequestBody @Valid ExpenseDTO expenseDTO) {
+        return expenseService.updateExpense(user.userId(), expenseDTO);
     }
 
     @DeleteMapping("/{id}")
