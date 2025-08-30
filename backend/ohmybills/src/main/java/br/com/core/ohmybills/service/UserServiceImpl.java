@@ -26,7 +26,6 @@ public class UserServiceImpl extends GenericServiceImpl<User, UUID, UserReposito
 
     @Override
     public UUID resolveOrCreateUserIdBySub(UUID keycloakId, String email, String name) {
-
         Optional<User> existingByKc = repository.findByKeycloakId(keycloakId);
         if (existingByKc.isPresent()) {
             return existingByKc.get().getId();
