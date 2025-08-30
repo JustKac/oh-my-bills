@@ -2,9 +2,7 @@ package br.com.core.ohmybills.model;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.Type;
 import org.hibernate.type.SqlTypes;
-import org.hibernate.usertype.UserType;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

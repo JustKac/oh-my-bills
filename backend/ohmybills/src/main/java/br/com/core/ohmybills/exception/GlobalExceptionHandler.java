@@ -129,7 +129,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ResponseStatusException.class)
     ProblemDetail handleResponseStatus(ResponseStatusException ex, HttpServletRequest req) {
         var pd = base(HttpStatus.valueOf(ex.getStatusCode().value()), null, ex.getReason(), req);
-        logAt(HttpStatus.valueOf(pd.getStatus()), "ResponseStatus on {}: {}", req.getRequestURI(), ex.getReason());
+        logAt(HttpStatus.valueOf(pd.getStatus()), req.getRequestURI(), ex.getReason());
         return pd;
     }
 
@@ -156,13 +156,13 @@ public class GlobalExceptionHandler {
         return Optional.ofNullable(r.getMessage()).orElse(t.getMessage());
     }
 
-    private void logAt(HttpStatus status, String fmt, Object... args) {
+    private void logAt(HttpStatus status, Object... args) {
         if (status.is5xxServerError()) {
-            log.error(fmt, args);
+            log.error("ResponseStatus on {}: {}", args);
         } else if (status.is4xxClientError()) {
-            log.warn(fmt, args);
+            log.warn("ResponseStatus on {}: {}", args);
         } else {
-            log.info(fmt, args);
+            log.info("ResponseStatus on {}: {}", args);
         }
     }
 }

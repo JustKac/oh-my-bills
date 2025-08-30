@@ -26,7 +26,7 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, UUID, Expens
     @Override
     public PageResponseDTO<ExpenseDTO> listExpenses(UUID userId, int page, int size) {
         var result = repository.findAllByUserId(userId, PageRequest.of(page, size));
-        return new PageResponseDTO<ExpenseDTO>(
+        return new PageResponseDTO<>(
                 result.getContent().stream().map(expense -> new ExpenseDTO(
                         expense.getId(),
                         expense.getDescription(),
