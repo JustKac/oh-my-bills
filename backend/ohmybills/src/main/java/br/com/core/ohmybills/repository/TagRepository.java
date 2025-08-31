@@ -4,8 +4,8 @@ import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import br.com.core.ohmybills.model.PersonTag;
+import br.com.core.ohmybills.model.Tag;
 
-public interface PersonTagRepository extends JpaRepository<PersonTag, UUID> {
+public interface TagRepository extends JpaRepository<Tag, UUID> {
 
 }

@@ -10,7 +10,7 @@ import jakarta.persistence.PreUpdate;
 @MappedSuperclass
 public abstract class AuditableEntity extends AbstractEntity {
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Column

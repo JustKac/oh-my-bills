@@ -27,8 +27,9 @@ CREATE TABLE tb_invoice (
 );
 
 -- Tabela de tag de pessoa
-CREATE TABLE tb_person_tag (
+CREATE TABLE tb_tag (
     id UUID PRIMARY KEY,
+    is_person BOOLEAN,
     name VARCHAR(100)
 );
 
@@ -55,8 +56,17 @@ CREATE TABLE tb_expense (
     installments INTEGER,
     user_id UUID NOT NULL,
     invoice_id UUID,
-    person_tag_id UUID,
+    tag_id UUID,
     FOREIGN KEY (user_id) REFERENCES tb_user(id),
     FOREIGN KEY (invoice_id) REFERENCES tb_invoice(id),
-    FOREIGN KEY (person_tag_id) REFERENCES tb_person_tag(id)
+    FOREIGN KEY (tag_id) REFERENCES tb_tag(id)
+);
+
+-- Tabela para armazenar avatares de usuário
+CREATE TABLE tb_user_avatar (
+    user_id UUID PRIMARY KEY REFERENCES tb_user(id) ON DELETE CASCADE,
+    content_type VARCHAR(100) NOT NULL,
+    data bytea NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP
 );

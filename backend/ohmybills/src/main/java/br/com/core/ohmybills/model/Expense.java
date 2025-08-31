@@ -40,9 +40,9 @@ public class Expense extends AbstractEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     private Invoice invoice;
 
-    @JoinColumn(name = "person_tag_id", referencedColumnName = "id")
+    @JoinColumn(name = "tag_id", referencedColumnName = "id")
     @ManyToOne(fetch = FetchType.LAZY)
-    private PersonTag personTag;
+    private Tag tag;
 
     public String getDescription() {
         return description;
@@ -116,12 +116,12 @@ public class Expense extends AbstractEntity{
         return this;
     }
 
-    public PersonTag getPersonTag() {
-        return personTag;
+    public Tag getTag() {
+        return tag;
     }
 
-    public Expense setPersonTag(PersonTag personTag) {
-        this.personTag = personTag;
+    public Expense SetTag(Tag tag) {
+        this.tag = tag;
         return this;
     }
 
