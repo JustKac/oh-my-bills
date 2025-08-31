@@ -63,4 +63,18 @@ public class ExpenseController {
         expenseService.importExpenses(user.userId(), expenses);
         return ResponseEntity.accepted().build();
     }
+
+    @PostMapping("/{expenseId}/tags/{tagId}")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    public ResponseEntity<Void> addTagToExpense(@CurrentUser UserContext user, @PathVariable UUID expenseId, @PathVariable UUID tagId) {
+        expenseService.addTagToExpense(user.userId(), expenseId, tagId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{expenseId}/tags/{tagId}")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    public ResponseEntity<Void> removeTagFromExpense(@CurrentUser UserContext user, @PathVariable UUID expenseId, @PathVariable UUID tagId) {
+        expenseService.removeTagFromExpense(user.userId(), expenseId, tagId);
+        return ResponseEntity.noContent().build();
+    }
 }

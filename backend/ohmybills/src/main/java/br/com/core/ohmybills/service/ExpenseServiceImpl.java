@@ -1,5 +1,6 @@
 package br.com.core.ohmybills.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,10 +18,12 @@ import br.com.core.ohmybills.repository.ExpenseRepository;
 public class ExpenseServiceImpl extends GenericServiceImpl<Expense, UUID, ExpenseRepository> implements ExpenseService {
 
     private final UserServiceImpl userService;
+    private final TagServiceImpl tagService;
 
-    public ExpenseServiceImpl(ExpenseRepository repository, UserServiceImpl userService) {
+    public ExpenseServiceImpl(ExpenseRepository repository, UserServiceImpl userService, TagServiceImpl tagService) {
         super(repository);
         this.userService = userService;
+        this.tagService = tagService;
     }
 
     @Override
@@ -33,7 +36,8 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, UUID, Expens
                         expense.getFirstPayDate(),
                         expense.getAmount(),
                         expense.getInstallments(),
-                        expense.getIsRecurring()
+                        expense.getIsRecurring(),
+                        tagService.findByExpenseId(userId, expense.getId())
                 )).toList(),
                 result.getNumber(),
                 result.getSize(),
@@ -52,7 +56,8 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, UUID, Expens
                 expenseFound.getFirstPayDate(),
                 expenseFound.getAmount(),
                 expenseFound.getInstallments(),
-                expenseFound.getIsRecurring()
+                expenseFound.getIsRecurring(),
+                tagService.findByExpenseId(userId, expenseId)
         );
     }
 
@@ -84,7 +89,8 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, UUID, Expens
                 expenseToUpdate.getFirstPayDate(),
                 expenseToUpdate.getAmount(),
                 expenseToUpdate.getInstallments(),
-                expenseToUpdate.getIsRecurring()
+                expenseToUpdate.getIsRecurring(),
+                Collections.emptyList()
         );
     }
 
@@ -106,6 +112,22 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, UUID, Expens
                         .setIsRecurring(expenseDTO.isRecurring())
                         .setUser(userFound)
         ).toList());
+    }
+
+    @Override
+    public void addTagToExpense(UUID userId, UUID expenseId, UUID tagId) {
+        Expense expense = findByIdAndUserId(expenseId, userId);
+        var tag = tagService.findByIdAndUserId(tagId, userId);
+        expense.getTags().add(tag);
+        save(expense);
+    }
+
+    @Override
+    public void removeTagFromExpense(UUID userId, UUID expenseId, UUID tagId) {
+        Expense expense = findByIdAndUserId(expenseId, userId);
+        var tag = tagService.findByIdAndUserId(tagId, userId);
+        expense.getTags().remove(tag);
+        save(expense);
     }
 
     private Expense findByIdAndUserId(UUID id, UUID userId) {

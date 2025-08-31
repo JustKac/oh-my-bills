@@ -1,17 +1,18 @@
 package br.com.core.ohmybills.service;
 
+import br.com.core.ohmybills.dto.PageResponseDTO;
+import br.com.core.ohmybills.dto.TagDTO;
+
+import java.util.List;
 import java.util.UUID;
 
-import org.springframework.stereotype.Service;
+public interface TagService {
 
-import br.com.core.ohmybills.model.Tag;
-import br.com.core.ohmybills.repository.TagRepository;
-
-@Service
-public class TagService extends GenericServiceImpl<Tag, UUID, TagRepository> {
-
-    public TagService(TagRepository repository) {
-        super(repository);
-    }
+    PageResponseDTO<TagDTO> listTags(UUID userId, int page, int size);
+    TagDTO findTagById(UUID userId, UUID id);
+    void addTag(UUID userId, TagDTO tagDTO);
+    TagDTO updateTag(UUID userId, TagDTO tagDTO);
+    void deleteTagById(UUID userId, UUID id);
+    List<TagDTO> findByExpenseId(UUID userId, UUID expenseId);
 
 }

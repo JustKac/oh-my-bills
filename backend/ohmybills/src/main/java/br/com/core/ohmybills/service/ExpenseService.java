@@ -15,5 +15,7 @@ public interface ExpenseService {
     ExpenseDTO updateExpense(UUID userId, ExpenseDTO expenseDTO);
     void deleteExpenseById(UUID userId, UUID id);
     void importExpenses(UUID userId, List<ExpenseDTO> expenses);
+    void addTagToExpense(UUID userId, UUID expenseId, UUID tagId);
+    void removeTagFromExpense(UUID userId, UUID expenseId, UUID tagId);
 
 }
