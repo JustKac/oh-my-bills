@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import br.com.core.ohmybills.dto.CreditCardDTO;
 import br.com.core.ohmybills.dto.ExpenseDTO;
 import br.com.core.ohmybills.dto.PageResponseDTO;
 import br.com.core.ohmybills.model.User;
@@ -19,11 +20,13 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, UUID, Expens
 
     private final UserServiceImpl userService;
     private final TagServiceImpl tagService;
+    private final CreditCardServiceImpl creditCardService;
 
-    public ExpenseServiceImpl(ExpenseRepository repository, UserServiceImpl userService, TagServiceImpl tagService) {
+    public ExpenseServiceImpl(ExpenseRepository repository, UserServiceImpl userService, TagServiceImpl tagService, CreditCardServiceImpl creditCardService) {
         super(repository);
         this.userService = userService;
         this.tagService = tagService;
+        this.creditCardService = creditCardService;
     }
 
     @Override
@@ -37,6 +40,7 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, UUID, Expens
                         expense.getAmount(),
                         expense.getInstallments(),
                         expense.getIsRecurring(),
+                        toCreditCardDTO(expense),
                         tagService.findByExpenseId(userId, expense.getId())
                 )).toList(),
                 result.getNumber(),
@@ -57,6 +61,7 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, UUID, Expens
                 expenseFound.getAmount(),
                 expenseFound.getInstallments(),
                 expenseFound.getIsRecurring(),
+                toCreditCardDTO(expenseFound),
                 tagService.findByExpenseId(userId, expenseId)
         );
     }
@@ -90,6 +95,7 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, UUID, Expens
                 expenseToUpdate.getAmount(),
                 expenseToUpdate.getInstallments(),
                 expenseToUpdate.getIsRecurring(),
+                toCreditCardDTO(expenseToUpdate),
                 Collections.emptyList()
         );
     }
@@ -130,7 +136,38 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, UUID, Expens
         save(expense);
     }
 
+    @Override
+    public void addCreditCardToExpense(UUID userId, UUID expenseId, UUID creditCardId) {
+        Expense expense = findByIdAndUserId(expenseId, userId);
+        var creditCard = creditCardService.findByIdAndUserId(creditCardId, userId);
+        expense.setCreditCard(creditCard);
+        save(expense);
+    }
+
+    @Override
+    public void removeCreditCardFromExpense(UUID userId, UUID expenseId) {
+        Expense expense = findByIdAndUserId(expenseId, userId);
+        expense.setCreditCard(null);
+        save(expense);
+    }
+
     private Expense findByIdAndUserId(UUID id, UUID userId) {
         return repository.findByIdAndUserId(id, userId).orElseThrow(EntityNotFoundException::new);
+    }
+
+    private CreditCardDTO toCreditCardDTO(Expense expense) {
+        var creditCard = expense.getCreditCard();
+        if (creditCard == null) {
+            return null;
+        }
+        return new CreditCardDTO(
+                creditCard.getId(),
+                creditCard.getName(),
+                creditCard.getLastFourDigits(),
+                creditCard.getBrand(),
+                creditCard.getCreditLimit(),
+                creditCard.getDueDate(),
+                creditCard.getBestShoppingDay()
+        );
     }
 }

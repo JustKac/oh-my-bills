@@ -1,17 +1,17 @@
 package br.com.core.ohmybills.service;
 
+import br.com.core.ohmybills.dto.CreditCardDTO;
+import br.com.core.ohmybills.dto.PageResponseDTO;
+
+import java.util.List;
 import java.util.UUID;
 
-import org.springframework.stereotype.Service;
+public interface CreditCardService {
 
-import br.com.core.ohmybills.model.CreditCard;
-import br.com.core.ohmybills.repository.CreditCardRepository;
-
-@Service
-public class CreditCardService extends GenericServiceImpl<CreditCard, UUID, CreditCardRepository> {
-
-    public CreditCardService(CreditCardRepository repository) {
-        super(repository);
-    }
+    PageResponseDTO<CreditCardDTO> listCreditCards(UUID userId, int page, int size);
+    CreditCardDTO findCreditCardById(UUID userId, UUID id);
+    void addCreditCard(UUID userId, CreditCardDTO creditCardDTO);
+    CreditCardDTO updateCreditCard(UUID userId, CreditCardDTO creditCardDTO);
+    void deleteCreditCardById(UUID userId, UUID id);
 
 }

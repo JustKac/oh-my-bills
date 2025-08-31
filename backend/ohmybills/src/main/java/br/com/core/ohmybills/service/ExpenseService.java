@@ -3,7 +3,6 @@ package br.com.core.ohmybills.service;
 import br.com.core.ohmybills.dto.ExpenseDTO;
 import br.com.core.ohmybills.dto.PageResponseDTO;
 
-
 import java.util.List;
 import java.util.UUID;
 
@@ -17,5 +16,7 @@ public interface ExpenseService {
     void importExpenses(UUID userId, List<ExpenseDTO> expenses);
     void addTagToExpense(UUID userId, UUID expenseId, UUID tagId);
     void removeTagFromExpense(UUID userId, UUID expenseId, UUID tagId);
+    void addCreditCardToExpense(UUID userId, UUID expenseId, UUID creditCardId);
+    void removeCreditCardFromExpense(UUID userId, UUID expenseId);
 
 }

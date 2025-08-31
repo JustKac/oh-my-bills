@@ -77,4 +77,18 @@ public class ExpenseController {
         expenseService.removeTagFromExpense(user.userId(), expenseId, tagId);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{expenseId}/credit-card/{creditCardId}")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    public ResponseEntity<Void> addCreditCardToExpense(@CurrentUser UserContext user, @PathVariable UUID expenseId, @PathVariable UUID creditCardId) {
+        expenseService.addCreditCardToExpense(user.userId(), expenseId, creditCardId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{expenseId}/credit-card")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    public ResponseEntity<Void> removeCreditCardFromExpense(@CurrentUser UserContext user, @PathVariable UUID expenseId) {
+        expenseService.removeCreditCardFromExpense(user.userId(), expenseId);
+        return ResponseEntity.noContent().build();
+    }
 }

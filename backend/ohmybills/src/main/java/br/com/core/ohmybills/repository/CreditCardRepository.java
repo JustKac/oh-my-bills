@@ -1,11 +1,17 @@
 package br.com.core.ohmybills.repository;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import br.com.core.ohmybills.model.CreditCard;
 
 public interface CreditCardRepository extends JpaRepository<CreditCard, UUID> {
-
+    Optional<CreditCard> findByIdAndUserId(UUID id, UUID userId);
+    Page<CreditCard> findAllByUserId(UUID userId, PageRequest pageRequest);
+    List<CreditCard> findByUserIdAndExpensesId(UUID userId, UUID expenseId);
 }
