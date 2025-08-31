@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
 
 @Entity(name = "tb_expense")
 public class Expense extends AbstractEntity{
@@ -26,7 +25,6 @@ public class Expense extends AbstractEntity{
     private Boolean isAchived;
 
     @Column(nullable = false)
-    @Min(1)
     private Integer installments;
 
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
@@ -36,6 +34,10 @@ public class Expense extends AbstractEntity{
     @JoinColumn(name = "invoice_id", referencedColumnName = "id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Invoice invoice;
+
+    @JoinColumn(name = "credit_card_id", referencedColumnName = "id")
+    @ManyToOne(fetch = FetchType.EAGER)
+    private CreditCard creditCard;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -114,6 +116,15 @@ public class Expense extends AbstractEntity{
 
     public Expense setInvoice(Invoice invoice) {
         this.invoice = invoice;
+        return this;
+    }
+
+    public CreditCard getCreditCard() {
+        return creditCard;
+    }
+
+    public Expense setCreditCard(CreditCard creditCard) {
+        this.creditCard = creditCard;
         return this;
     }
 

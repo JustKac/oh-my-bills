@@ -15,7 +15,7 @@ public class Invoice extends AbstractEntity {
     @Column(name = "name", length = 100)
     private String name;
 
-    @JoinColumn(name = "credit_card", referencedColumnName = "id")
+    @JoinColumn(name = "credit_card_id", referencedColumnName = "id")
     @ManyToOne(fetch = FetchType.LAZY)
     private CreditCard creditCard;
 

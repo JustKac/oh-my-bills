@@ -15,15 +15,19 @@ CREATE TABLE tb_credit_card (
     credit_limit NUMERIC(10,2),
     due_date DATE,
     best_shopping_day DATE,
-    name VARCHAR(255)
+    name VARCHAR(255),
+    last_four_digits CHAR(4),
+    brand VARCHAR(50),
+    user_id UUID NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES tb_user(id)
 );
 
 -- Tabela de fatura
 CREATE TABLE tb_invoice (
     id UUID PRIMARY KEY,
     name VARCHAR(100),
-    credit_card UUID,
-    FOREIGN KEY (credit_card) REFERENCES tb_credit_card(id)
+    credit_card_id UUID,
+    FOREIGN KEY (credit_card_id) REFERENCES tb_credit_card(id)
 );
 
 -- Tabela de tag de pessoa
@@ -58,8 +62,9 @@ CREATE TABLE tb_expense (
     is_achived BOOLEAN,
     installments INTEGER,
     user_id UUID NOT NULL,
+    credit_card_id UUID,
     invoice_id UUID,
-    tag_id UUID,
+    FOREIGN KEY (credit_card_id) REFERENCES tb_credit_card(id),
     FOREIGN KEY (user_id) REFERENCES tb_user(id),
     FOREIGN KEY (invoice_id) REFERENCES tb_invoice(id)
 );

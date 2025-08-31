@@ -29,6 +29,9 @@ public class User extends AuditableEntity {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Tag> tags;
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<CreditCard> creditCards;
+
     public String getName() {
         return name;
     }
@@ -77,5 +80,12 @@ public class User extends AuditableEntity {
         this.tags = tags;
     }
 
+    public List<CreditCard> getCreditCards() {
+        return creditCards;
+    }
+
+    public void setCreditCards(List<CreditCard> creditCards) {
+        this.creditCards = creditCards;
+    }
     
 }
