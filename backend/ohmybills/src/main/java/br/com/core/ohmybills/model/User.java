@@ -25,8 +25,9 @@ public class User extends AuditableEntity {
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Expense> expenses;
-    
-    // private String pictureUrl;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Tag> tags;
 
     public String getName() {
         return name;
@@ -66,6 +67,14 @@ public class User extends AuditableEntity {
 
     public void setExpenses(List<Expense> expenses) {
         this.expenses = expenses;
+    }
+
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
     }
 
     

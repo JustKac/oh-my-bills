@@ -2,12 +2,9 @@ package br.com.core.ohmybills.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 
 @Entity(name = "tb_expense")
@@ -40,9 +37,13 @@ public class Expense extends AbstractEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     private Invoice invoice;
 
-    @JoinColumn(name = "tag_id", referencedColumnName = "id")
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Tag tag;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "tb_expense_tag",
+            joinColumns = @JoinColumn(name = "expense_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private List<Tag> tags;
 
     public String getDescription() {
         return description;
@@ -116,12 +117,12 @@ public class Expense extends AbstractEntity{
         return this;
     }
 
-    public Tag getTag() {
-        return tag;
+    public List<Tag> getTags() {
+        return tags;
     }
 
-    public Expense SetTag(Tag tag) {
-        this.tag = tag;
+    public Expense setTags(List<Tag> tags) {
+        this.tags = tags;
         return this;
     }
 

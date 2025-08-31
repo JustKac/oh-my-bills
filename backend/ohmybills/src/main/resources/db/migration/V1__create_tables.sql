@@ -30,7 +30,10 @@ CREATE TABLE tb_invoice (
 CREATE TABLE tb_tag (
     id UUID PRIMARY KEY,
     is_person BOOLEAN,
-    name VARCHAR(100)
+    color VARCHAR(7),
+    name VARCHAR(100),
+    user_id UUID NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES tb_user(id)
 );
 
 -- Tabela de receita
@@ -58,8 +61,7 @@ CREATE TABLE tb_expense (
     invoice_id UUID,
     tag_id UUID,
     FOREIGN KEY (user_id) REFERENCES tb_user(id),
-    FOREIGN KEY (invoice_id) REFERENCES tb_invoice(id),
-    FOREIGN KEY (tag_id) REFERENCES tb_tag(id)
+    FOREIGN KEY (invoice_id) REFERENCES tb_invoice(id)
 );
 
 -- Tabela para armazenar avatares de usuário
@@ -69,4 +71,13 @@ CREATE TABLE tb_user_avatar (
     data bytea NOT NULL,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP
+);
+
+-- Tabela de junção ManyToMany entre Expense e Tag
+CREATE TABLE tb_expense_tag (
+    expense_id UUID NOT NULL,
+    tag_id UUID NOT NULL,
+    PRIMARY KEY (expense_id, tag_id),
+    FOREIGN KEY (expense_id) REFERENCES tb_expense(id) ON DELETE CASCADE,
+    FOREIGN KEY (tag_id) REFERENCES tb_tag(id) ON DELETE CASCADE
 );
