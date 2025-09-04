@@ -1,5 +1,6 @@
 package br.com.core.ohmybills.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -111,5 +112,10 @@ public class IncomeServiceImpl extends GenericServiceImpl<Income, UUID, IncomeRe
 
     private Income findByIdAndUserId(UUID id, UUID userId) {
         return repository.findByIdAndUserId(id, userId).orElseThrow(EntityNotFoundException::new);
+    }
+
+    @Override
+    public List<Income> findByUserIdAndFirstPayDateBefore(UUID userId, LocalDate endOfMonth) {
+        return repository.findByUser_IdAndFirstPayDateBefore(userId, endOfMonth);
     }
 }

@@ -1,5 +1,6 @@
 package br.com.core.ohmybills.service;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -169,5 +170,13 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, UUID, Expens
                 creditCard.getDueDate(),
                 creditCard.getBestShoppingDay()
         );
+    }
+
+    public List<Expense> findByUserIdAndFirstPayDateBefore(UUID userId, LocalDate endOfMonth) {
+        return repository.findByUser_IdAndFirstPayDateBeforeAndIsArchivedFalse(userId, endOfMonth);
+    }
+
+    public List<Expense> findAllRecurringExpenses(UUID userId) {
+        return repository.findByUser_IdAndIsRecurringTrueAndIsArchivedFalse(userId);
     }
 }

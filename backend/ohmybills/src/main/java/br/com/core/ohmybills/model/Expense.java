@@ -22,7 +22,7 @@ public class Expense extends AbstractEntity{
     private Boolean isRecurring;
 
     @Column(nullable = false)
-    private Boolean isAchived;
+    private Boolean isArchived;
 
     @Column(nullable = false)
     private Integer installments;
@@ -83,12 +83,12 @@ public class Expense extends AbstractEntity{
         return this;
     }
 
-    public Boolean getIsAchived() {
-        return isAchived;
+    public Boolean getIsArchived() {
+        return isArchived;
     }
 
-    public Expense setIsAchived(Boolean isAchived) {
-        this.isAchived = isAchived;
+    public Expense setIsArchived(Boolean isAchived) {
+        this.isArchived = isAchived;
         return this;
     }
 
