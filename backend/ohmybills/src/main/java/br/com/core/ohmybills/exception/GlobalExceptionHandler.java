@@ -24,25 +24,27 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    public static final String RESPONSE_STATUS_ON = "ResponseStatus on {}: {}";
+    public static final String REQUISICAO_INVALIDA = "Requisição inválida";
 
     // 400 - Erros de validação em payload (Bean Validation em @RequestBody)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     ProblemDetail handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpServletRequest req) {
-        var pd = base(HttpStatus.BAD_REQUEST, "Requisição inválida", "Erros de validação no corpo da requisição.", req);
+        var pd = base(HttpStatus.BAD_REQUEST, REQUISICAO_INVALIDA, "Erros de validação no corpo da requisição.", req);
         List<Map<String, Object>> errors = ex.getBindingResult().getFieldErrors().stream()
                 .map(fe -> Map.of(
                         "field", fe.getField(),
                         "message", Optional.ofNullable(fe.getDefaultMessage()).orElse("valor inválido"),
-                        "rejected", fe.getRejectedValue()))
-                .collect(Collectors.toList());
+                        "rejected", Objects.requireNonNull(fe.getRejectedValue())))
+                .toList();
         pd.setProperty("errors", errors);
         log.warn("400 Validation error on {} -> {}", req.getRequestURI(), errors);
         return pd;
@@ -51,13 +53,13 @@ public class GlobalExceptionHandler {
     // 400 - Erros de validação em parâmetros (@RequestParam/@PathVariable)
     @ExceptionHandler(ConstraintViolationException.class)
     ProblemDetail handleConstraintViolation(ConstraintViolationException ex, HttpServletRequest req) {
-        var pd = base(HttpStatus.BAD_REQUEST, "Requisição inválida", "Erros de validação em parâmetros.", req);
+        var pd = base(HttpStatus.BAD_REQUEST, REQUISICAO_INVALIDA, "Erros de validação em parâmetros.", req);
         List<Map<String, Object>> errors = ex.getConstraintViolations().stream()
                 .map(v -> Map.of(
                         "param", v.getPropertyPath().toString(),
                         "message", v.getMessage(),
                         "rejected", v.getInvalidValue()))
-                .collect(Collectors.toList());
+                .toList();
         pd.setProperty("errors", errors);
         log.warn("400 Constraint violation on {} -> {}", req.getRequestURI(), errors);
         return pd;
@@ -67,7 +69,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     ProblemDetail handleNotReadable(HttpMessageNotReadableException ex, HttpServletRequest req) {
         log.warn("400 Not readable on {}: {}", req.getRequestURI(), ex.getMostSpecificCause().getMessage());
-        return base(HttpStatus.BAD_REQUEST, "Requisição inválida", "Formato do corpo inválido ou não legível.", req);
+        return base(HttpStatus.BAD_REQUEST, REQUISICAO_INVALIDA, "Formato do corpo inválido ou não legível.", req);
     }
 
     // 400 - Parâmetro obrigatório ausente
@@ -75,7 +77,7 @@ public class GlobalExceptionHandler {
     ProblemDetail handleMissingParam(MissingServletRequestParameterException ex, HttpServletRequest req) {
         var detail = "Parâmetro obrigatório ausente: " + ex.getParameterName();
         log.warn("400 Missing parameter on {}: {}", req.getRequestURI(), detail);
-        return base(HttpStatus.BAD_REQUEST, "Requisição inválida", detail, req);
+        return base(HttpStatus.BAD_REQUEST, REQUISICAO_INVALIDA, detail, req);
     }
 
     // 400 - Tipo de parâmetro incompatível
@@ -83,7 +85,7 @@ public class GlobalExceptionHandler {
     ProblemDetail handleTypeMismatch(MethodArgumentTypeMismatchException ex, HttpServletRequest req) {
         var detail = "Parâmetro '" + ex.getName() + "' com tipo inválido.";
         log.warn("400 Type mismatch on {}: {}", req.getRequestURI(), detail);
-        return base(HttpStatus.BAD_REQUEST, "Requisição inválida", detail, req);
+        return base(HttpStatus.BAD_REQUEST, REQUISICAO_INVALIDA, detail, req);
     }
 
     // 404 - Rota não encontrada (necessita propriedade para lançar NoHandlerFoundException)
@@ -96,7 +98,9 @@ public class GlobalExceptionHandler {
     // 404 - Rota não encontrada (necessita propriedade para lançar NoHandlerFoundException)
     @ExceptionHandler(EntityNotFoundException.class)
     ProblemDetail handleEntityNotFound(EntityNotFoundException ex, HttpServletRequest req) {
-        log.warn("404 Entity not found on {}: {}", req.getRequestURI(), rootMsg(ex));
+        if (log.isWarnEnabled()) {
+            log.warn("404 Entity not found on {}: {}", req.getRequestURI(), rootMsg(ex));
+        }
         return base(HttpStatus.NOT_FOUND, "Recurso não encontrado", "Entidade solicitada não foi encontrada.", req);
     }
 
@@ -121,7 +125,9 @@ public class GlobalExceptionHandler {
     // 409 - Violações de integridade (chave única, FK, etc.)
     @ExceptionHandler(DataIntegrityViolationException.class)
     ProblemDetail handleDataIntegrity(DataIntegrityViolationException ex, HttpServletRequest req) {
-        log.warn("409 Data integrity on {}: {}", req.getRequestURI(), rootMsg(ex));
+        if (log.isWarnEnabled()) {
+            log.warn("409 Data integrity on {}: {}", req.getRequestURI(), rootMsg(ex));
+        }
         return base(HttpStatus.CONFLICT, "Conflito de dados", "Operação viola regras de integridade.", req);
     }
 
@@ -158,11 +164,11 @@ public class GlobalExceptionHandler {
 
     private void logAt(HttpStatus status, Object... args) {
         if (status.is5xxServerError()) {
-            log.error("ResponseStatus on {}: {}", args);
+            log.error(RESPONSE_STATUS_ON, args);
         } else if (status.is4xxClientError()) {
-            log.warn("ResponseStatus on {}: {}", args);
+            log.warn(RESPONSE_STATUS_ON, args);
         } else {
-            log.info("ResponseStatus on {}: {}", args);
+            log.info(RESPONSE_STATUS_ON, args);
         }
     }
 }

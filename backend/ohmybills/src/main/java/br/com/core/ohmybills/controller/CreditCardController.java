@@ -38,15 +38,15 @@ public class CreditCardController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
-    public ResponseEntity<Void> create(@CurrentUser UserContext user, @RequestBody @Valid CreditCardDTO CreditCardDTO) {
-        creditCardService.addCreditCard(user.userId(), CreditCardDTO);
+    public ResponseEntity<Void> create(@CurrentUser UserContext user, @RequestBody @Valid CreditCardDTO creditCardDTO) {
+        creditCardService.addCreditCard(user.userId(), creditCardDTO);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
-    public CreditCardDTO update(@CurrentUser UserContext user, @RequestBody @Valid CreditCardDTO CreditCardDTO) {
-        return creditCardService.updateCreditCard(user.userId(), CreditCardDTO);
+    public CreditCardDTO update(@CurrentUser UserContext user, @RequestBody @Valid CreditCardDTO creditCardDTO) {
+        return creditCardService.updateCreditCard(user.userId(), creditCardDTO);
     }
 
     @DeleteMapping("/{id}")

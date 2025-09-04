@@ -38,15 +38,15 @@ public class TagController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
-    public ResponseEntity<Void> create(@CurrentUser UserContext user, @RequestBody @Valid TagDTO TagDTO) {
-        tagService.addTag(user.userId(), TagDTO);
+    public ResponseEntity<Void> create(@CurrentUser UserContext user, @RequestBody @Valid TagDTO tagDTO) {
+        tagService.addTag(user.userId(), tagDTO);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
-    public TagDTO update(@CurrentUser UserContext user, @RequestBody @Valid TagDTO TagDTO) {
-        return tagService.updateTag(user.userId(), TagDTO);
+    public TagDTO update(@CurrentUser UserContext user, @RequestBody @Valid TagDTO tagDTO) {
+        return tagService.updateTag(user.userId(), tagDTO);
     }
 
     @DeleteMapping("/{id}")

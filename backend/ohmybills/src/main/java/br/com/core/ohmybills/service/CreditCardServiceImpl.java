@@ -1,6 +1,5 @@
 package br.com.core.ohmybills.service;
 
-import java.util.List;
 import java.util.UUID;
 
 import br.com.core.ohmybills.dto.CreditCardDTO;

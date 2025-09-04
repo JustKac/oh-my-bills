@@ -3,7 +3,6 @@ package br.com.core.ohmybills.service;
 import br.com.core.ohmybills.dto.CreditCardDTO;
 import br.com.core.ohmybills.dto.PageResponseDTO;
 
-import java.util.List;
 import java.util.UUID;
 
 public interface CreditCardService {
