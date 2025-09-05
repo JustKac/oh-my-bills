@@ -64,6 +64,7 @@ public class MainPageServiceImpl implements MainPageService {
         BigDecimal total = BigDecimal.ZERO;
 
         for (Expense expense : expenses) {
+            if (expense.getIsArchived()) {continue;}
             LocalDate start = expense.getFirstPayDate();
             int installments = expense.getInstallments();
 
@@ -83,7 +84,7 @@ public class MainPageServiceImpl implements MainPageService {
         Map<String, BigDecimal> expensesByCreditCard = new HashMap<>();
 
         for (Expense expense : expenses.stream().filter(expense -> expense.getCreditCard() != null).toList()) {
-
+            if (expense.getIsArchived()) {continue;}
             String cardName = expense.getCreditCard().getName();
             LocalDate start = expense.getFirstPayDate();
             int installments = expense.getInstallments();
