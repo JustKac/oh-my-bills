@@ -33,7 +33,7 @@ public class MainPageServiceImpl implements MainPageService {
         return new MainPageDTO(
                 getTotalIncomeByYearMonth(incomes, yearMonth),
                 getTotalExpenseByYearMonth(expenses, yearMonth),
-                getTotalExpenseWithRecurrence(userId),
+                getTotalExpenseWithRecurrence(userId, yearMonth),
                 getTotalExpenseByCreditCard(expenses, yearMonth),
                 getTotalExpenseByTag(expenses, yearMonth));
     }
@@ -118,8 +118,8 @@ public class MainPageServiceImpl implements MainPageService {
     }
 
     @Override
-    public BigDecimal getTotalExpenseWithRecurrence(UUID userId) {
-        List<Expense> expenses = expenseService.findAllRecurringExpenses(userId);
+    public BigDecimal getTotalExpenseWithRecurrence(UUID userId, YearMonth yearMonth) {
+        List<Expense> expenses = expenseService.findAllRecurringExpenses(userId, yearMonth.atEndOfMonth());
         return expenses.stream().map(Expense::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 

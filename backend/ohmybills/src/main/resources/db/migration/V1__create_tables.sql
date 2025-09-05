@@ -59,7 +59,7 @@ CREATE TABLE tb_expense (
     amount NUMERIC(10,2),
     first_pay_date DATE,
     is_recurring BOOLEAN,
-    is_achived BOOLEAN,
+    is_archived BOOLEAN,
     installments INTEGER,
     user_id UUID NOT NULL,
     credit_card_id UUID,

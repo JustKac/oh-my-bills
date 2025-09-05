@@ -16,6 +16,6 @@ public interface ExpenseRepository extends JpaRepository<Expense, UUID> {
     Page<Expense> findAllByUserId(UUID userId, Pageable pageable);
 
     // Requests for MainPage
-    List<Expense> findByUser_IdAndFirstPayDateBeforeAndIsArchivedFalse(UUID userId, LocalDate firstPayDateBefore);
-    List<Expense> findByUser_IdAndIsRecurringTrueAndIsArchivedFalse(UUID userId);
+    List<Expense> findByUser_IdAndFirstPayDateBefore(UUID userId, LocalDate firstPayDateBefore);
+    List<Expense> findByUser_IdAndIsRecurringTrueAndFirstPayDateBefore(UUID userId, LocalDate firstPayDateBefore);
 }

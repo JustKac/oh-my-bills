@@ -17,5 +17,5 @@ public interface MainPageService {
     BigDecimal getTotalExpenseByYearMonth(List<Expense> expenses, YearMonth yearMonth);
     Map<String, BigDecimal> getTotalExpenseByCreditCard(List<Expense> expenses, YearMonth yearMonth);
     Map<String, BigDecimal> getTotalExpenseByTag(List<Expense> expenses, YearMonth yearMonth);
-    BigDecimal getTotalExpenseWithRecurrence(UUID userId);
+    BigDecimal getTotalExpenseWithRecurrence(UUID userId, YearMonth yearMonth);
 }
