@@ -7,6 +7,7 @@ import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 
+@SuppressWarnings("unused")
 @MappedSuperclass
 public abstract class AuditableEntity extends AbstractEntity {
 

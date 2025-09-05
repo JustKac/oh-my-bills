@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 
+@SuppressWarnings("unused")
 @MappedSuperclass
 public abstract class AbstractEntity {
 

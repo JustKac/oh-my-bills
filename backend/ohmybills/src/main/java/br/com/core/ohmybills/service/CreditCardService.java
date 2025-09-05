@@ -5,6 +5,7 @@ import br.com.core.ohmybills.dto.PageResponseDTO;
 
 import java.util.UUID;
 
+@SuppressWarnings("unused")
 public interface CreditCardService {
 
     PageResponseDTO<CreditCardDTO> listCreditCards(UUID userId, int page, int size);

@@ -4,6 +4,7 @@ import br.com.core.ohmybills.dto.UserDTO;
 
 import java.util.UUID;
 
+@SuppressWarnings("unused")
 public interface UserService {
     UserDTO getMe(UUID userId, UUID keycloakId);
     UUID resolveOrCreateUserIdBySub(UUID keycloakId, String email, String name);

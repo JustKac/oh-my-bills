@@ -37,17 +37,9 @@ public class UserAvatar {
         this.userId = userId;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
     @PrePersist
     public void setCreatedAt() {
         this.createdAt = LocalDateTime.now();
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
     }
 
     @PreUpdate

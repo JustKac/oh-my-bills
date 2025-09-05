@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+@SuppressWarnings("unused")
 public interface IncomeService {
     PageResponseDTO<IncomeDTO> listIncomes(UUID userId, int page, int size);
     IncomeDTO findIncomeById(UUID userId, UUID id);

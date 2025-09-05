@@ -6,6 +6,7 @@ import br.com.core.ohmybills.dto.PageResponseDTO;
 import java.util.List;
 import java.util.UUID;
 
+@SuppressWarnings("unused")
 public interface ExpenseService {
 
     PageResponseDTO<ExpenseDTO> listExpenses(UUID userId, int page, int size);

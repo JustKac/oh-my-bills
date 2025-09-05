@@ -6,6 +6,7 @@ import br.com.core.ohmybills.dto.TagDTO;
 import java.util.List;
 import java.util.UUID;
 
+@SuppressWarnings("unused")
 public interface TagService {
 
     PageResponseDTO<TagDTO> listTags(UUID userId, int page, int size);

@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
+@SuppressWarnings("unused")
 public interface GenericService<T, ID> {
 
     T save(T entity);

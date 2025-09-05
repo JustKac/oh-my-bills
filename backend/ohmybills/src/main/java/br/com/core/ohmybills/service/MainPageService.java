@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@SuppressWarnings("unused")
 public interface MainPageService {
 
     MainPageDTO getMainPageInfo(UUID userId, YearMonth yearMonth);
