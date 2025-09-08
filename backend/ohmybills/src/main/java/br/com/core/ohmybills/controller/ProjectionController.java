@@ -53,47 +53,6 @@ public class ProjectionController {
                 tagIds, cardIds, hasTags, hasCards));
     }
 
-    @GetMapping("/by-tags")
-    @PreAuthorize("hasAnyRole('ADMIN','USER')")
-    public ResponseEntity<List<ProjectionDTO>> getProjectionByTags(
-            @CurrentUser UserContext user,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM") YearMonth startMonth,
-            @RequestParam(defaultValue = "12") int months,
-            @RequestParam List<UUID> tagIds) {
-
-        return ResponseEntity.ok(
-                projectionService.getProjectionFilteredByTags(user.userId(), startMonth, months, tagIds)
-        );
-    }
-
-    @GetMapping("/by-cards")
-    @PreAuthorize("hasAnyRole('ADMIN','USER')")
-    public ResponseEntity<List<ProjectionDTO>> getProjectionByCards(
-            @CurrentUser UserContext user,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM") YearMonth startMonth,
-            @RequestParam(defaultValue = "12") int months,
-            @RequestParam List<UUID> cardIds) {
-
-        return ResponseEntity.ok(
-                projectionService.getProjectionFilteredByCards(user.userId(), startMonth, months, cardIds)
-        );
-    }
-
-    @GetMapping("/by-tags-and-cards")
-    @PreAuthorize("hasAnyRole('ADMIN','USER')")
-    public ResponseEntity<List<ProjectionDTO>> getProjectionByTagsAndCards(
-            @CurrentUser UserContext user,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM") YearMonth startMonth,
-            @RequestParam(defaultValue = "12") int months,
-            @RequestParam List<UUID> tagIds,
-            @RequestParam List<UUID> cardIds) {
-
-        return ResponseEntity.ok(
-                projectionService.getProjectionFilteredByTagsAndCards(
-                        user.userId(), startMonth, months, tagIds, cardIds)
-        );
-    }
-
     private List<ProjectionDTO> getProjectionDTOS(UserContext user, YearMonth startMonth, int months, List<UUID> tagIds, List<UUID> cardIds, boolean hasTags, boolean hasCards) {
         List<ProjectionDTO> result;
 
