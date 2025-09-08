@@ -4,6 +4,7 @@ import br.com.core.ohmybills.dto.ProjectionDTO;
 import br.com.core.ohmybills.model.Expense;
 import br.com.core.ohmybills.model.Income;
 import br.com.core.ohmybills.model.Tag;
+import br.com.core.ohmybills.utils.RecurrenceAndInstallmentsUtils;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -25,6 +26,9 @@ public class ProjectionPageImpl implements ProjectionPage {
         this.expenseService = expenseService;
     }
 
+    // TODO: Bug relacionado ao firstPayDate, valor vindo mesmo quando a data é posterior ao mês da projeção
+    // Exemplo: firstPayDate = 2024-07-10, mês da projeção = 2024-06
+    // Verificar se o problema está na query do repository ou na lógica de cálculo
     @Override
     public List<ProjectionDTO> getFinancialProjection(UUID userId, YearMonth startMonth, int months) {
         // Validar número de meses
@@ -147,8 +151,9 @@ public class ProjectionPageImpl implements ProjectionPage {
             LocalDate start = income.getFirstPayDate();
             int installments = income.getInstallments();
 
+            if (!RecurrenceAndInstallmentsUtils.verifyIfRecursInTheMonth(yearMonth, start)){continue;}
             boolean isRecurring = income.getIsRecurring();
-            boolean isApplies = isAppliesByInstallments(yearMonth, installments, start);
+            boolean isApplies = RecurrenceAndInstallmentsUtils.isAppliesByInstallments(yearMonth, installments, start);
 
             if (isRecurring || isApplies) {
                 total = total.add(income.getAmount());
@@ -162,16 +167,12 @@ public class ProjectionPageImpl implements ProjectionPage {
         BigDecimal total = BigDecimal.ZERO;
 
         for (Expense expense : expenses) {
-            // Ignorar despesas arquivadas
-            if (expense.getIsArchived()) {
-                continue;
-            }
-
             LocalDate start = expense.getFirstPayDate();
             int installments = expense.getInstallments();
 
+            if (expense.getIsArchived() || RecurrenceAndInstallmentsUtils.verifyIfRecursInTheMonth(yearMonth, start)){continue;}
             boolean isRecurring = expense.getIsRecurring();
-            boolean appliesByInstallments = isAppliesByInstallments(yearMonth, installments, start);
+            boolean appliesByInstallments = RecurrenceAndInstallmentsUtils.isAppliesByInstallments(yearMonth, installments, start);
 
             if (isRecurring || appliesByInstallments) {
                 total = total.add(expense.getAmount());
@@ -191,8 +192,9 @@ public class ProjectionPageImpl implements ProjectionPage {
             LocalDate start = expense.getFirstPayDate();
             int installments = expense.getInstallments();
 
+            if (RecurrenceAndInstallmentsUtils.verifyIfRecursInTheMonth(yearMonth, start)){continue;}
             boolean isRecurring = expense.getIsRecurring();
-            boolean appliesByInstallments = isAppliesByInstallments(yearMonth, installments, start);
+            boolean appliesByInstallments = RecurrenceAndInstallmentsUtils.isAppliesByInstallments(yearMonth, installments, start);
 
             if (isRecurring || appliesByInstallments) {
                 for (Tag tag : expense.getTags()) {
@@ -216,8 +218,9 @@ public class ProjectionPageImpl implements ProjectionPage {
             LocalDate start = expense.getFirstPayDate();
             int installments = expense.getInstallments();
 
+            if (RecurrenceAndInstallmentsUtils.verifyIfRecursInTheMonth(yearMonth, start)){continue;}
             boolean isRecurring = expense.getIsRecurring();
-            boolean appliesByInstallments = isAppliesByInstallments(yearMonth, installments, start);
+            boolean appliesByInstallments = RecurrenceAndInstallmentsUtils.isAppliesByInstallments(yearMonth, installments, start);
 
             if (isRecurring || appliesByInstallments) {
                 expensesByCard.merge(cardName, expense.getAmount(), BigDecimal::add);
@@ -249,15 +252,5 @@ public class ProjectionPageImpl implements ProjectionPage {
                 .filter(expense -> expense.getCreditCard() != null &&
                         cardIds.contains(expense.getCreditCard().getId()))
                 .collect(Collectors.toList());
-    }
-
-    private static boolean isAppliesByInstallments(YearMonth yearMonth, int installments, LocalDate start) {
-        for (int i = 0; i < installments; i++) {
-            LocalDate installmentDate = start.plusMonths(i);
-            if (YearMonth.from(installmentDate).equals(yearMonth)) {
-                return true;
-            }
-        }
-        return false;
     }
 }

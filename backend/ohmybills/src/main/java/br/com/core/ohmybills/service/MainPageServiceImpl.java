@@ -4,6 +4,7 @@ import br.com.core.ohmybills.dto.MainPageDTO;
 import br.com.core.ohmybills.model.Expense;
 import br.com.core.ohmybills.model.Income;
 import br.com.core.ohmybills.model.Tag;
+import br.com.core.ohmybills.utils.RecurrenceAndInstallmentsUtils;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -47,8 +48,9 @@ public class MainPageServiceImpl implements MainPageService {
             LocalDate start = income.getFirstPayDate();
             int installments = income.getInstallments();
 
+            if (RecurrenceAndInstallmentsUtils.verifyIfRecursInTheMonth(yearMonth, start)){continue;}
             boolean isRecurring = income.getIsRecurring();
-            boolean isApplies = isAppliesByInstallments(yearMonth, installments, start);
+            boolean isApplies = RecurrenceAndInstallmentsUtils.isAppliesByInstallments(yearMonth, installments, start);
 
             if (isRecurring || isApplies) {
                 total = total.add(income.getAmount());
@@ -68,8 +70,9 @@ public class MainPageServiceImpl implements MainPageService {
             LocalDate start = expense.getFirstPayDate();
             int installments = expense.getInstallments();
 
+            if (expense.getIsArchived() || RecurrenceAndInstallmentsUtils.verifyIfRecursInTheMonth(yearMonth, start)){continue;}
             boolean isRecurring = expense.getIsRecurring();
-            boolean appliesByInstallments = isAppliesByInstallments(yearMonth, installments, start);
+            boolean appliesByInstallments = RecurrenceAndInstallmentsUtils.isAppliesByInstallments(yearMonth, installments, start);
 
             if (isRecurring || appliesByInstallments) {
                 total = total.add(expense.getAmount());
@@ -84,13 +87,13 @@ public class MainPageServiceImpl implements MainPageService {
         Map<String, BigDecimal> expensesByCreditCard = new HashMap<>();
 
         for (Expense expense : expenses.stream().filter(expense -> expense.getCreditCard() != null).toList()) {
-            if (expense.getIsArchived()) {continue;}
             String cardName = expense.getCreditCard().getName();
             LocalDate start = expense.getFirstPayDate();
             int installments = expense.getInstallments();
 
+            if (expense.getIsArchived() || RecurrenceAndInstallmentsUtils.verifyIfRecursInTheMonth(yearMonth, start)){continue;}
             boolean isRecurring = expense.getIsRecurring();
-            boolean appliesByInstallments = isAppliesByInstallments(yearMonth, installments, start);
+            boolean appliesByInstallments = RecurrenceAndInstallmentsUtils.isAppliesByInstallments(yearMonth, installments, start);
 
             if (isRecurring || appliesByInstallments) {
                 expensesByCreditCard.merge(cardName, expense.getAmount(), BigDecimal::add);
@@ -108,8 +111,9 @@ public class MainPageServiceImpl implements MainPageService {
             LocalDate start = expense.getFirstPayDate();
             int installments = expense.getInstallments();
 
+            if (expense.getIsArchived() || RecurrenceAndInstallmentsUtils.verifyIfRecursInTheMonth(yearMonth, start)){continue;}
             boolean isRecurring = expense.getIsRecurring();
-            boolean appliesByInstallments = isAppliesByInstallments(yearMonth, installments, start);
+            boolean appliesByInstallments = RecurrenceAndInstallmentsUtils.isAppliesByInstallments(yearMonth, installments, start);
             if (isRecurring || appliesByInstallments){
                 applyTagsValues(expense, expensesByTags);
             }
@@ -128,15 +132,5 @@ public class MainPageServiceImpl implements MainPageService {
         for (Tag tag : expense.getTags()) {
             expensesByTags.merge(tag.getName(), expense.getAmount(), BigDecimal::add);
         }
-    }
-
-    private static boolean isAppliesByInstallments(YearMonth yearMonth, int installments, LocalDate start) {
-        for (int i = 0; i < installments; i++) {
-            LocalDate installmentDate = start.plusMonths(i);
-            if (YearMonth.from(installmentDate).equals(yearMonth)) {
-                return true;
-            }
-        }
-        return false;
     }
 }
