@@ -115,7 +115,7 @@ public class IncomeServiceImpl extends GenericServiceImpl<Income, UUID, IncomeRe
     }
 
     @Override
-    public List<Income> findByUserIdAndFirstPayDateBefore(UUID userId, LocalDate endOfMonth) {
-        return repository.findByUser_IdAndFirstPayDateBefore(userId, endOfMonth);
+    public List<Income> findByUserIdAndFirstPayDateBefore(UUID userId, LocalDate firstPayDatebefore) {
+        return repository.findByUser_IdAndFirstPayDateBefore(userId, firstPayDatebefore);
     }
 }

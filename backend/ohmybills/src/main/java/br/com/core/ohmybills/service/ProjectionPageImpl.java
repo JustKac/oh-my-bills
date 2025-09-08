@@ -3,7 +3,6 @@ package br.com.core.ohmybills.service;
 import br.com.core.ohmybills.dto.ProjectionDTO;
 import br.com.core.ohmybills.model.Expense;
 import br.com.core.ohmybills.model.Income;
-import br.com.core.ohmybills.model.Tag;
 import br.com.core.ohmybills.utils.RecurrenceAndInstallmentsUtils;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +17,6 @@ public class ProjectionPageImpl implements ProjectionPage {
 
     private final IncomeServiceImpl incomeService;
     private final ExpenseServiceImpl expenseService;
-
     private static final int MAX_PROJECTION_MONTHS = 12;
 
     public ProjectionPageImpl(IncomeServiceImpl incomeService, ExpenseServiceImpl expenseService) {
@@ -26,108 +24,76 @@ public class ProjectionPageImpl implements ProjectionPage {
         this.expenseService = expenseService;
     }
 
-    // TODO: Bug relacionado ao firstPayDate, valor vindo mesmo quando a data é posterior ao mês da projeção
-    // Exemplo: firstPayDate = 2024-07-10, mês da projeção = 2024-06
-    // Verificar se o problema está na query do repository ou na lógica de cálculo
     @Override
     public List<ProjectionDTO> getFinancialProjection(UUID userId, YearMonth startMonth, int months) {
-        // Validar número de meses
         int monthsToProject = Math.min(months, MAX_PROJECTION_MONTHS);
-
-        // Buscar todos os dados necessários
         LocalDate endDate = startMonth.plusMonths(monthsToProject).atDay(1);
+
         List<Income> incomes = incomeService.findByUserIdAndFirstPayDateBefore(userId, endDate);
         List<Expense> expenses = expenseService.findByUserIdAndFirstPayDateBefore(userId, endDate);
 
-        // Criar projeções para cada mês
         return generateProjections(startMonth, monthsToProject, incomes, expenses);
     }
 
     @Override
     public List<ProjectionDTO> getProjectionFilteredByTags(UUID userId, YearMonth startMonth, int months, List<UUID> tagIds) {
-        // Validar número de meses
         int monthsToProject = Math.min(months, MAX_PROJECTION_MONTHS);
-
-        // Buscar todos os dados necessários
         LocalDate endDate = startMonth.plusMonths(monthsToProject).atDay(1);
-        List<Income> incomes = incomeService.findByUserIdAndFirstPayDateBefore(userId, endDate);
 
-        // Buscar apenas despesas com as tags selecionadas
+        List<Income> incomes = incomeService.findByUserIdAndFirstPayDateBefore(userId, endDate);
         List<Expense> allExpenses = expenseService.findByUserIdAndFirstPayDateBefore(userId, endDate);
         List<Expense> filteredExpenses = filterExpensesByTags(allExpenses, tagIds);
 
-        // Criar projeções para cada mês
         return generateProjections(startMonth, monthsToProject, incomes, filteredExpenses);
     }
 
-    /**
-     * Obtém a projeção financeira filtrada por cartões de crédito
-     *
-     * @param userId ID do usuário
-     * @param startMonth Mês inicial da projeção
-     * @param months Número de meses a projetar
-     * @param cardIds IDs dos cartões para filtrar
-     * @return Lista de projeções mensais filtradas
-     */
     public List<ProjectionDTO> getProjectionFilteredByCards(UUID userId, YearMonth startMonth, int months, List<UUID> cardIds) {
-        // Validar número de meses
         int monthsToProject = Math.min(months, MAX_PROJECTION_MONTHS);
-
-        // Buscar todos os dados necessários
         LocalDate endDate = startMonth.plusMonths(monthsToProject).atDay(1);
-        List<Income> incomes = incomeService.findByUserIdAndFirstPayDateBefore(userId, endDate);
 
-        // Buscar apenas despesas com os cartões selecionados
+        List<Income> incomes = incomeService.findByUserIdAndFirstPayDateBefore(userId, endDate);
         List<Expense> allExpenses = expenseService.findByUserIdAndFirstPayDateBefore(userId, endDate);
         List<Expense> filteredExpenses = filterExpensesByCards(allExpenses, cardIds);
 
-        // Criar projeções para cada mês
         return generateProjections(startMonth, monthsToProject, incomes, filteredExpenses);
     }
 
-    /**
-     * Obtém a projeção financeira filtrada por tags e cartões de crédito
-     *
-     * @param userId ID do usuário
-     * @param startMonth Mês inicial da projeção
-     * @param months Número de meses a projetar
-     * @param tagIds IDs das tags para filtrar
-     * @param cardIds IDs dos cartões para filtrar
-     * @return Lista de projeções mensais filtradas
-     */
     public List<ProjectionDTO> getProjectionFilteredByTagsAndCards(
             UUID userId, YearMonth startMonth, int months, List<UUID> tagIds, List<UUID> cardIds) {
-        // Validar número de meses
         int monthsToProject = Math.min(months, MAX_PROJECTION_MONTHS);
-
-        // Buscar todos os dados necessários
         LocalDate endDate = startMonth.plusMonths(monthsToProject).atDay(1);
+
         List<Income> incomes = incomeService.findByUserIdAndFirstPayDateBefore(userId, endDate);
-
-        // Buscar apenas despesas com as tags e cartões selecionados
         List<Expense> allExpenses = expenseService.findByUserIdAndFirstPayDateBefore(userId, endDate);
-        List<Expense> filteredByTags = filterExpensesByTags(allExpenses, tagIds);
-        List<Expense> filteredExpenses = filterExpensesByCards(filteredByTags, cardIds);
 
-        // Criar projeções para cada mês
+        // Aplicar os dois filtros em sequência
+        List<Expense> filteredExpenses = filterExpensesByCards(
+                filterExpensesByTags(allExpenses, tagIds),
+                cardIds
+        );
+
         return generateProjections(startMonth, monthsToProject, incomes, filteredExpenses);
     }
 
     private List<ProjectionDTO> generateProjections(
             YearMonth startMonth, int monthsToProject, List<Income> incomes, List<Expense> expenses) {
+
         List<ProjectionDTO> projections = new ArrayList<>();
         YearMonth currentMonth = startMonth;
         BigDecimal accumulatedBalance = BigDecimal.ZERO;
 
         for (int i = 0; i < monthsToProject; i++) {
-            BigDecimal monthlyIncome = calculateMonthlyIncome(incomes, currentMonth);
-            BigDecimal monthlyExpense = calculateMonthlyExpense(expenses, currentMonth);
+            // Calcular totais para o mês atual
+            BigDecimal monthlyIncome = calculateMonthlyTotal(incomes, currentMonth);
+            BigDecimal monthlyExpense = calculateMonthlyTotal(expenses, currentMonth);
             BigDecimal monthlyBalance = monthlyIncome.subtract(monthlyExpense);
             accumulatedBalance = accumulatedBalance.add(monthlyBalance);
 
-            Map<String, BigDecimal> expensesByTag = calculateExpensesByTag(expenses, currentMonth);
-            Map<String, BigDecimal> expensesByCard = calculateExpensesByCard(expenses, currentMonth);
+            // Calcular despesas por categoria
+            Map<String, BigDecimal> expensesByTag = calculateExpensesByCategory(expenses, currentMonth, true);
+            Map<String, BigDecimal> expensesByCard = calculateExpensesByCategory(expenses, currentMonth, false);
 
+            // Criar DTO de projeção
             projections.add(new ProjectionDTO(
                     currentMonth,
                     monthlyIncome,
@@ -138,96 +104,98 @@ public class ProjectionPageImpl implements ProjectionPage {
                     expensesByCard
             ));
 
+            // Avançar para o próximo mês
             currentMonth = currentMonth.plusMonths(1);
         }
 
         return projections;
     }
 
-    private BigDecimal calculateMonthlyIncome(List<Income> incomes, YearMonth yearMonth) {
-        BigDecimal total = BigDecimal.ZERO;
-
-        for (Income income : incomes) {
-            LocalDate start = income.getFirstPayDate();
-            int installments = income.getInstallments();
-
-            if (!RecurrenceAndInstallmentsUtils.verifyIfRecursInTheMonth(yearMonth, start)){continue;}
-            boolean isRecurring = income.getIsRecurring();
-            boolean isApplies = RecurrenceAndInstallmentsUtils.isAppliesByInstallments(yearMonth, installments, start);
-
-            if (isRecurring || isApplies) {
-                total = total.add(income.getAmount());
-            }
+    /**
+     * Calcula o total mensal para receitas ou despesas.
+     */
+    private <T> BigDecimal calculateMonthlyTotal(List<T> items, YearMonth yearMonth) {
+        if (items == null || items.isEmpty()) {
+            return BigDecimal.ZERO;
         }
 
-        return total;
-    }
-
-    private BigDecimal calculateMonthlyExpense(List<Expense> expenses, YearMonth yearMonth) {
         BigDecimal total = BigDecimal.ZERO;
 
-        for (Expense expense : expenses) {
-            LocalDate start = expense.getFirstPayDate();
-            int installments = expense.getInstallments();
-
-            if (expense.getIsArchived() || RecurrenceAndInstallmentsUtils.verifyIfRecursInTheMonth(yearMonth, start)){continue;}
-            boolean isRecurring = expense.getIsRecurring();
-            boolean appliesByInstallments = RecurrenceAndInstallmentsUtils.isAppliesByInstallments(yearMonth, installments, start);
-
-            if (isRecurring || appliesByInstallments) {
-                total = total.add(expense.getAmount());
+        if (items.get(0) instanceof Income) {
+            for (T item : items) {
+                Income income = (Income) item;
+                if (shouldApplyIncome(income, yearMonth)) {
+                    total = total.add(income.getAmount());
+                }
             }
-        }
-
-        return total;
-    }
-
-    private Map<String, BigDecimal> calculateExpensesByTag(List<Expense> expenses, YearMonth yearMonth) {
-        Map<String, BigDecimal> expensesByTag = new HashMap<>();
-
-        for (Expense expense : expenses.stream()
-                .filter(e -> !e.getIsArchived() && e.getTags() != null && !e.getTags().isEmpty())
-                .toList()) {
-
-            LocalDate start = expense.getFirstPayDate();
-            int installments = expense.getInstallments();
-
-            if (RecurrenceAndInstallmentsUtils.verifyIfRecursInTheMonth(yearMonth, start)){continue;}
-            boolean isRecurring = expense.getIsRecurring();
-            boolean appliesByInstallments = RecurrenceAndInstallmentsUtils.isAppliesByInstallments(yearMonth, installments, start);
-
-            if (isRecurring || appliesByInstallments) {
-                for (Tag tag : expense.getTags()) {
-                    String tagName = tag.getName();
-                    expensesByTag.merge(tagName, expense.getAmount(), BigDecimal::add);
+        } else if (items.get(0) instanceof Expense) {
+            for (T item : items) {
+                Expense expense = (Expense) item;
+                if (!expense.getIsArchived() && shouldApplyExpense(expense, yearMonth)) {
+                    total = total.add(expense.getAmount());
                 }
             }
         }
 
-        return expensesByTag;
+        return total;
     }
 
-    private Map<String, BigDecimal> calculateExpensesByCard(List<Expense> expenses, YearMonth yearMonth) {
-        Map<String, BigDecimal> expensesByCard = new HashMap<>();
+    /**
+     * Calcula despesas por categoria (tag ou cartão).
+     *
+     * @param byTag true para calcular por tag, false para calcular por cartão
+     */
+    private Map<String, BigDecimal> calculateExpensesByCategory(
+            List<Expense> expenses, YearMonth yearMonth, boolean byTag) {
 
-        for (Expense expense : expenses.stream()
-                .filter(e -> !e.getIsArchived() && e.getCreditCard() != null)
-                .toList()) {
+        Map<String, BigDecimal> result = new HashMap<>();
 
-            String cardName = expense.getCreditCard().getName();
-            LocalDate start = expense.getFirstPayDate();
-            int installments = expense.getInstallments();
+        for (Expense expense : expenses) {
+            if (expense.getIsArchived() || !shouldApplyExpense(expense, yearMonth)) {
+                continue;
+            }
 
-            if (RecurrenceAndInstallmentsUtils.verifyIfRecursInTheMonth(yearMonth, start)){continue;}
-            boolean isRecurring = expense.getIsRecurring();
-            boolean appliesByInstallments = RecurrenceAndInstallmentsUtils.isAppliesByInstallments(yearMonth, installments, start);
-
-            if (isRecurring || appliesByInstallments) {
-                expensesByCard.merge(cardName, expense.getAmount(), BigDecimal::add);
+            if (byTag) {
+                // Agrupar por tag
+                if (expense.getTags() != null && !expense.getTags().isEmpty()) {
+                    expense.getTags().forEach(tag ->
+                            result.merge(tag.getName(), expense.getAmount(), BigDecimal::add)
+                    );
+                }
+            } else {
+                // Agrupar por cartão
+                if (expense.getCreditCard() != null) {
+                    String cardName = expense.getCreditCard().getName();
+                    result.merge(cardName, expense.getAmount(), BigDecimal::add);
+                }
             }
         }
 
-        return expensesByCard;
+        return result;
+    }
+
+    private boolean shouldApplyIncome(Income income, YearMonth yearMonth) {
+        LocalDate startDate = income.getFirstPayDate();
+
+        // Verifica se a data de início está no mês ou antes dele
+        if (!RecurrenceAndInstallmentsUtils.isDateInOrBeforeMonth(yearMonth, startDate)) {
+            return false;
+        }
+
+        return income.getIsRecurring() ||
+                RecurrenceAndInstallmentsUtils.isAnyInstallmentInMonth(yearMonth, income.getInstallments(), startDate);
+    }
+
+    private boolean shouldApplyExpense(Expense expense, YearMonth yearMonth) {
+        LocalDate startDate = expense.getFirstPayDate();
+
+        // Verifica se a data de início está no mês ou antes dele
+        if (!RecurrenceAndInstallmentsUtils.isDateInOrBeforeMonth(yearMonth, startDate)) {
+            return false;
+        }
+
+        return expense.getIsRecurring() ||
+                RecurrenceAndInstallmentsUtils.isAnyInstallmentInMonth(yearMonth, expense.getInstallments(), startDate);
     }
 
     private List<Expense> filterExpensesByTags(List<Expense> expenses, List<UUID> tagIds) {

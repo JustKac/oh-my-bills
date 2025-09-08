@@ -3,7 +3,6 @@ package br.com.core.ohmybills.service;
 import br.com.core.ohmybills.dto.MainPageDTO;
 import br.com.core.ohmybills.model.Expense;
 import br.com.core.ohmybills.model.Income;
-import br.com.core.ohmybills.model.Tag;
 import br.com.core.ohmybills.utils.RecurrenceAndInstallmentsUtils;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class MainPageServiceImpl implements MainPageService {
@@ -21,103 +21,63 @@ public class MainPageServiceImpl implements MainPageService {
     private final IncomeServiceImpl incomeService;
     private final ExpenseServiceImpl expenseService;
 
-    public MainPageServiceImpl (IncomeServiceImpl incomeService, ExpenseServiceImpl expenseService) {
+    public MainPageServiceImpl(IncomeServiceImpl incomeService, ExpenseServiceImpl expenseService) {
         this.incomeService = incomeService;
         this.expenseService = expenseService;
     }
 
     @Override
     public MainPageDTO getMainPageInfo(UUID userId, YearMonth yearMonth) {
-        List<Income> incomes = incomeService.findByUserIdAndFirstPayDateBefore(userId, yearMonth.atEndOfMonth());
-        List<Expense> expenses = expenseService.findByUserIdAndFirstPayDateBefore(userId, yearMonth.atEndOfMonth());
+        List<Income> incomes = incomeService.findByUserIdAndFirstPayDateBefore(userId, yearMonth.atEndOfMonth().plusDays(1));
+        List<Expense> expenses = expenseService.findByUserIdAndFirstPayDateBefore(userId, yearMonth.atEndOfMonth().plusDays(1));
 
         return new MainPageDTO(
                 getTotalIncomeByYearMonth(incomes, yearMonth),
                 getTotalExpenseByYearMonth(expenses, yearMonth),
                 getTotalExpenseWithRecurrence(userId, yearMonth),
                 getTotalExpenseByCreditCard(expenses, yearMonth),
-                getTotalExpenseByTag(expenses, yearMonth));
+                getTotalExpenseByTag(expenses, yearMonth)
+        );
     }
 
     @Override
     public BigDecimal getTotalIncomeByYearMonth(List<Income> incomes, YearMonth yearMonth) {
-
-        BigDecimal total = BigDecimal.ZERO;
-
-        for (Income income : incomes) {
-            LocalDate start = income.getFirstPayDate();
-            int installments = income.getInstallments();
-
-            if (RecurrenceAndInstallmentsUtils.verifyIfRecursInTheMonth(yearMonth, start)){continue;}
-            boolean isRecurring = income.getIsRecurring();
-            boolean isApplies = RecurrenceAndInstallmentsUtils.isAppliesByInstallments(yearMonth, installments, start);
-
-            if (isRecurring || isApplies) {
-                total = total.add(income.getAmount());
-            }
-        }
-
-        return total;
+        return incomes.stream()
+                .filter(income -> shouldApplyIncome(income, yearMonth))
+                .map(Income::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     @Override
     public BigDecimal getTotalExpenseByYearMonth(List<Expense> expenses, YearMonth yearMonth) {
-
-        BigDecimal total = BigDecimal.ZERO;
-
-        for (Expense expense : expenses) {
-            if (expense.getIsArchived()) {continue;}
-            LocalDate start = expense.getFirstPayDate();
-            int installments = expense.getInstallments();
-
-            if (expense.getIsArchived() || RecurrenceAndInstallmentsUtils.verifyIfRecursInTheMonth(yearMonth, start)){continue;}
-            boolean isRecurring = expense.getIsRecurring();
-            boolean appliesByInstallments = RecurrenceAndInstallmentsUtils.isAppliesByInstallments(yearMonth, installments, start);
-
-            if (isRecurring || appliesByInstallments) {
-                total = total.add(expense.getAmount());
-            }
-        }
-
-        return total;
+        return expenses.stream()
+                .filter(expense -> !expense.getIsArchived())
+                .filter(expense -> shouldApplyExpense(expense, yearMonth))
+                .map(Expense::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     @Override
     public Map<String, BigDecimal> getTotalExpenseByCreditCard(List<Expense> expenses, YearMonth yearMonth) {
-        Map<String, BigDecimal> expensesByCreditCard = new HashMap<>();
-
-        for (Expense expense : expenses.stream().filter(expense -> expense.getCreditCard() != null).toList()) {
-            String cardName = expense.getCreditCard().getName();
-            LocalDate start = expense.getFirstPayDate();
-            int installments = expense.getInstallments();
-
-            if (expense.getIsArchived() || RecurrenceAndInstallmentsUtils.verifyIfRecursInTheMonth(yearMonth, start)){continue;}
-            boolean isRecurring = expense.getIsRecurring();
-            boolean appliesByInstallments = RecurrenceAndInstallmentsUtils.isAppliesByInstallments(yearMonth, installments, start);
-
-            if (isRecurring || appliesByInstallments) {
-                expensesByCreditCard.merge(cardName, expense.getAmount(), BigDecimal::add);
-            }
-        }
-
-        return expensesByCreditCard;
+        return expenses.stream()
+                .filter(expense -> !expense.getIsArchived())
+                .filter(expense -> expense.getCreditCard() != null)
+                .filter(expense -> shouldApplyExpense(expense, yearMonth))
+                .collect(Collectors.groupingBy(
+                        expense -> expense.getCreditCard().getName(),
+                        Collectors.reducing(BigDecimal.ZERO, Expense::getAmount, BigDecimal::add)
+                ));
     }
 
     @Override
     public Map<String, BigDecimal> getTotalExpenseByTag(List<Expense> expenses, YearMonth yearMonth) {
         Map<String, BigDecimal> expensesByTags = new HashMap<>();
 
-        for (Expense expense : expenses.stream().filter(expense -> expense.getTags() != null).toList()) {
-            LocalDate start = expense.getFirstPayDate();
-            int installments = expense.getInstallments();
-
-            if (expense.getIsArchived() || RecurrenceAndInstallmentsUtils.verifyIfRecursInTheMonth(yearMonth, start)){continue;}
-            boolean isRecurring = expense.getIsRecurring();
-            boolean appliesByInstallments = RecurrenceAndInstallmentsUtils.isAppliesByInstallments(yearMonth, installments, start);
-            if (isRecurring || appliesByInstallments){
-                applyTagsValues(expense, expensesByTags);
-            }
-        }
+        expenses.stream()
+                .filter(expense -> !expense.getIsArchived())
+                .filter(expense -> expense.getTags() != null && !expense.getTags().isEmpty())
+                .filter(expense -> shouldApplyExpense(expense, yearMonth))
+                .forEach(expense -> applyTagsValues(expense, expensesByTags));
 
         return expensesByTags;
     }
@@ -125,12 +85,38 @@ public class MainPageServiceImpl implements MainPageService {
     @Override
     public BigDecimal getTotalExpenseWithRecurrence(UUID userId, YearMonth yearMonth) {
         List<Expense> expenses = expenseService.findAllRecurringExpenses(userId, yearMonth.atEndOfMonth());
-        return expenses.stream().map(Expense::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+        return expenses.stream()
+                .map(Expense::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private boolean shouldApplyIncome(Income income, YearMonth yearMonth) {
+        LocalDate startDate = income.getFirstPayDate();
+
+        // Verifica se a data de início está no mês ou antes dele
+        if (!RecurrenceAndInstallmentsUtils.isDateInOrBeforeMonth(yearMonth, startDate)) {
+            return false;
+        }
+
+        return income.getIsRecurring() ||
+                RecurrenceAndInstallmentsUtils.isAnyInstallmentInMonth(yearMonth, income.getInstallments(), startDate);
+    }
+
+    private boolean shouldApplyExpense(Expense expense, YearMonth yearMonth) {
+        LocalDate startDate = expense.getFirstPayDate();
+
+        // Verifica se a data de início está no mês ou antes dele
+        if (!RecurrenceAndInstallmentsUtils.isDateInOrBeforeMonth(yearMonth, startDate)) {
+            return false;
+        }
+
+        return expense.getIsRecurring() ||
+                RecurrenceAndInstallmentsUtils.isAnyInstallmentInMonth(yearMonth, expense.getInstallments(), startDate);
     }
 
     private static void applyTagsValues(Expense expense, Map<String, BigDecimal> expensesByTags) {
-        for (Tag tag : expense.getTags()) {
-            expensesByTags.merge(tag.getName(), expense.getAmount(), BigDecimal::add);
-        }
+        expense.getTags().forEach(tag ->
+                expensesByTags.merge(tag.getName(), expense.getAmount(), BigDecimal::add)
+        );
     }
 }

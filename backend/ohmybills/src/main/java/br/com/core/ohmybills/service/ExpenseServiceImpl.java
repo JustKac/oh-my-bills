@@ -172,11 +172,11 @@ public class ExpenseServiceImpl extends GenericServiceImpl<Expense, UUID, Expens
         );
     }
 
-    public List<Expense> findByUserIdAndFirstPayDateBefore(UUID userId, LocalDate endOfMonth) {
-        return repository.findByUser_IdAndFirstPayDateBefore(userId, endOfMonth);
+    public List<Expense> findByUserIdAndFirstPayDateBefore(UUID userId, LocalDate firstPayDateBefore) {
+        return repository.findByUser_IdAndFirstPayDateBefore(userId, firstPayDateBefore);
     }
 
-    public List<Expense> findAllRecurringExpenses(UUID userId, LocalDate endOfMonth) {
-        return repository.findByUser_IdAndIsRecurringTrueAndFirstPayDateBefore(userId, endOfMonth);
+    public List<Expense> findAllRecurringExpenses(UUID userId, LocalDate firstPayDateBefore) {
+        return repository.findByUser_IdAndIsRecurringTrueAndFirstPayDateBefore(userId, firstPayDateBefore);
     }
 }
