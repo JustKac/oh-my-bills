@@ -1,8 +1,9 @@
-package br.com.core.ohmybills.service;
+package br.com.core.ohmybills.service.impl;
 
 import br.com.core.ohmybills.dto.UserDTO;
 import br.com.core.ohmybills.model.User;
 import br.com.core.ohmybills.repository.UserRepository;
+import br.com.core.ohmybills.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

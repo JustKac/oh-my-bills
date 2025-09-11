@@ -1,6 +1,7 @@
-package br.com.core.ohmybills.service;
+package br.com.core.ohmybills.service.impl;
 
 import br.com.core.ohmybills.dto.AuthTokenDTO;
+import br.com.core.ohmybills.service.AuthService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;

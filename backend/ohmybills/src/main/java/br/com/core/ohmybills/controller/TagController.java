@@ -4,7 +4,7 @@ import br.com.core.ohmybills.dto.TagDTO;
 import br.com.core.ohmybills.dto.PageResponseDTO;
 import br.com.core.ohmybills.security.CurrentUser;
 import br.com.core.ohmybills.security.UserContext;
-import br.com.core.ohmybills.service.TagServiceImpl;
+import br.com.core.ohmybills.service.impl.TagServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

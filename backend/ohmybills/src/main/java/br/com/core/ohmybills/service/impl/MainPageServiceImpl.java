@@ -1,8 +1,9 @@
-package br.com.core.ohmybills.service;
+package br.com.core.ohmybills.service.impl;
 
 import br.com.core.ohmybills.dto.MainPageDTO;
 import br.com.core.ohmybills.model.Expense;
 import br.com.core.ohmybills.model.Income;
+import br.com.core.ohmybills.service.MainPageService;
 import br.com.core.ohmybills.utils.RecurrenceAndInstallmentsUtils;
 import org.springframework.stereotype.Service;
 

@@ -4,7 +4,7 @@ import br.com.core.ohmybills.dto.PageResponseDTO;
 import br.com.core.ohmybills.dto.CreditCardDTO;
 import br.com.core.ohmybills.security.CurrentUser;
 import br.com.core.ohmybills.security.UserContext;
-import br.com.core.ohmybills.service.CreditCardServiceImpl;
+import br.com.core.ohmybills.service.impl.CreditCardServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

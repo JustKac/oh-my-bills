@@ -1,7 +1,8 @@
-package br.com.core.ohmybills.service;
+package br.com.core.ohmybills.service.impl;
 
 import br.com.core.ohmybills.model.UserAvatar;
 import br.com.core.ohmybills.repository.UserAvatarRepository;
+import br.com.core.ohmybills.service.AvatarService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

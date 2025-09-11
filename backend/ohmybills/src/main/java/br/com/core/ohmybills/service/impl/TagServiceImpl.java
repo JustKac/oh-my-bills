@@ -1,10 +1,11 @@
-package br.com.core.ohmybills.service;
+package br.com.core.ohmybills.service.impl;
 
 import java.util.List;
 import java.util.UUID;
 
 import br.com.core.ohmybills.dto.PageResponseDTO;
 import br.com.core.ohmybills.dto.TagDTO;
+import br.com.core.ohmybills.service.TagService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package br.com.core.ohmybills.service;
+package br.com.core.ohmybills.service.impl;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -7,6 +7,7 @@ import java.util.UUID;
 import br.com.core.ohmybills.dto.IncomeDTO;
 import br.com.core.ohmybills.dto.PageResponseDTO;
 import br.com.core.ohmybills.model.User;
+import br.com.core.ohmybills.service.IncomeService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;

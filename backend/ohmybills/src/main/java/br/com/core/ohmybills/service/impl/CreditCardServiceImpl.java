@@ -1,9 +1,10 @@
-package br.com.core.ohmybills.service;
+package br.com.core.ohmybills.service.impl;
 
 import java.util.UUID;
 
 import br.com.core.ohmybills.dto.CreditCardDTO;
 import br.com.core.ohmybills.dto.PageResponseDTO;
+import br.com.core.ohmybills.service.CreditCardService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 

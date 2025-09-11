@@ -3,7 +3,7 @@ package br.com.core.ohmybills.controller;
 import br.com.core.ohmybills.dto.MainPageDTO;
 import br.com.core.ohmybills.security.CurrentUser;
 import br.com.core.ohmybills.security.UserContext;
-import br.com.core.ohmybills.service.MainPageServiceImpl;
+import br.com.core.ohmybills.service.impl.MainPageServiceImpl;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

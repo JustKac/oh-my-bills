@@ -3,7 +3,7 @@ package br.com.core.ohmybills.controller;
 import br.com.core.ohmybills.dto.ProjectionDTO;
 import br.com.core.ohmybills.security.CurrentUser;
 import br.com.core.ohmybills.security.UserContext;
-import br.com.core.ohmybills.service.ProjectionPageImpl;
+import br.com.core.ohmybills.service.impl.ProjectionPageImpl;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

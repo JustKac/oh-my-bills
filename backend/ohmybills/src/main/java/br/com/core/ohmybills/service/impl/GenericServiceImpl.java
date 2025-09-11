@@ -1,5 +1,6 @@
-package br.com.core.ohmybills.service;
+package br.com.core.ohmybills.service.impl;
 
+import br.com.core.ohmybills.service.GenericService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

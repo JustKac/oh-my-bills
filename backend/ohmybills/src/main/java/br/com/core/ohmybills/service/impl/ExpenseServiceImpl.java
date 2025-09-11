@@ -1,4 +1,4 @@
-package br.com.core.ohmybills.service;
+package br.com.core.ohmybills.service.impl;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -9,6 +9,7 @@ import br.com.core.ohmybills.dto.CreditCardDTO;
 import br.com.core.ohmybills.dto.ExpenseDTO;
 import br.com.core.ohmybills.dto.PageResponseDTO;
 import br.com.core.ohmybills.model.User;
+import br.com.core.ohmybills.service.ExpenseService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
