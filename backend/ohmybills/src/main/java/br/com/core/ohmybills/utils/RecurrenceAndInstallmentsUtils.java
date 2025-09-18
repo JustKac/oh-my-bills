@@ -5,6 +5,8 @@ import java.time.YearMonth;
 
 public class RecurrenceAndInstallmentsUtils {
 
+    private RecurrenceAndInstallmentsUtils(){}
+
     /**
      * Verifica se a data está no mês especificado ou em um mês anterior.
      *

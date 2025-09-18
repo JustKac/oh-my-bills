@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @SuppressWarnings("unused")
 public interface AvatarService {
-    void save(UUID id, MultipartFile file) throws IOException;
+    void save(UUID id, MultipartFile file);
     UserAvatar get(UUID id);
     void delete(UUID id);
 }

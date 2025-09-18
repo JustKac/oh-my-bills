@@ -30,7 +30,7 @@ public class UserAvatarController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
     public ResponseEntity<Void> uploadAvatar(@CurrentUser UserContext user,
-                                             @RequestPart("file") MultipartFile file) throws Exception {
+                                             @RequestPart("file") MultipartFile file) {
         avatarService.save(user.userId(), file);
         return ResponseEntity.noContent().build();
     }
@@ -38,7 +38,7 @@ public class UserAvatarController {
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
     public ResponseEntity<byte[]> getAvatar(@CurrentUser UserContext user,
-                                            @RequestHeader(value = HttpHeaders.IF_NONE_MATCH, required = false) String ifNoneMatch) throws Exception {
+                                            @RequestHeader(value = HttpHeaders.IF_NONE_MATCH, required = false) String ifNoneMatch) {
         UserAvatar avatar = avatarService.get(user.userId());
         return validateAndGetImage(ifNoneMatch, avatar);
     }
@@ -50,8 +50,14 @@ public class UserAvatarController {
         return ResponseEntity.noContent().build();
     }
 
-    private ResponseEntity<byte[]> validateAndGetImage(String ifNoneMatch, UserAvatar avatar) throws NoSuchAlgorithmException {
-        String etag = "\"" + HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(avatar.getData())) + "\"";
+    private ResponseEntity<byte[]> validateAndGetImage(String ifNoneMatch, UserAvatar avatar) {
+
+        String etag;
+        try {
+            etag = "\"" + HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(avatar.getData())) + "\"";
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("Algoritmo SHA-256 não disponível", e);
+        }
 
         if (etag.equals(ifNoneMatch)) {
             return ResponseEntity.status(304).eTag(etag).build();

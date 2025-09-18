@@ -4,8 +4,10 @@ import br.com.core.ohmybills.model.UserAvatar;
 import br.com.core.ohmybills.repository.UserAvatarRepository;
 import br.com.core.ohmybills.service.AvatarService;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.Set;
@@ -22,7 +24,7 @@ public class AvatarServiceImpl extends GenericServiceImpl<UserAvatar, UUID, User
     }
 
     @Override
-    public void save(UUID id, MultipartFile file) throws IOException {
+    public void save(UUID id, MultipartFile file) {
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("Arquivo não enviado.");
         }
@@ -36,7 +38,13 @@ public class AvatarServiceImpl extends GenericServiceImpl<UserAvatar, UUID, User
 
         UserAvatar avatar = findOrNew(id);
         avatar.setContentType(ct);
-        avatar.setData(file.getBytes());
+        try {
+            avatar.setData(file.getBytes());
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Erro ao processar o arquivo enviado", e);
+        }
+
+
         save(avatar);
     }
 

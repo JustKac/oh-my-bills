@@ -11,7 +11,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class ProjectionPageImpl implements ProjectionPage {
@@ -122,17 +121,17 @@ public class ProjectionPageImpl implements ProjectionPage {
 
         BigDecimal total = BigDecimal.ZERO;
 
-        if (items.get(0) instanceof Income) {
+        if (items.getFirst() instanceof Income) {
             for (T item : items) {
                 Income income = (Income) item;
                 if (shouldApplyIncome(income, yearMonth)) {
                     total = total.add(income.getAmount());
                 }
             }
-        } else if (items.get(0) instanceof Expense) {
+        } else if (items.getFirst() instanceof Expense) {
             for (T item : items) {
                 Expense expense = (Expense) item;
-                if (!expense.getIsArchived() && shouldApplyExpense(expense, yearMonth)) {
+                if (Boolean.FALSE.equals(expense.getIsArchived()) && shouldApplyExpense(expense, yearMonth)) {
                     total = total.add(expense.getAmount());
                 }
             }
@@ -152,7 +151,7 @@ public class ProjectionPageImpl implements ProjectionPage {
         Map<String, BigDecimal> result = new HashMap<>();
 
         for (Expense expense : expenses) {
-            if (expense.getIsArchived() || !shouldApplyExpense(expense, yearMonth)) {
+            if (Boolean.TRUE.equals(expense.getIsArchived()) || !shouldApplyExpense(expense, yearMonth)) {
                 continue;
             }
 
@@ -209,7 +208,7 @@ public class ProjectionPageImpl implements ProjectionPage {
                         !expense.getTags().isEmpty() &&
                         expense.getTags().stream()
                                 .anyMatch(tag -> tagIds.contains(tag.getId())))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private List<Expense> filterExpensesByCards(List<Expense> expenses, List<UUID> cardIds) {
@@ -220,6 +219,6 @@ public class ProjectionPageImpl implements ProjectionPage {
         return expenses.stream()
                 .filter(expense -> expense.getCreditCard() != null &&
                         cardIds.contains(expense.getCreditCard().getId()))
-                .collect(Collectors.toList());
+                .toList();
     }
 }

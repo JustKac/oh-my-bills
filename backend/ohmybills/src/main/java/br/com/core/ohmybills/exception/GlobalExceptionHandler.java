@@ -146,6 +146,15 @@ public class GlobalExceptionHandler {
         return base(HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno", "Ocorreu um erro não esperado.", req);
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    ProblemDetail handleIllegalState(IllegalStateException ex, HttpServletRequest req) {
+        if (log.isErrorEnabled()) {
+            log.error("500 Illegal state on {}: {}", req.getRequestURI(), rootMsg(ex));
+        }
+        return base(HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno", "Erro inesperado ao processar a requisição.", req);
+    }
+
+
     // Utilitário para criar ProblemDetail com metadados consistentes
     private ProblemDetail base(HttpStatus status, String title, String detail, HttpServletRequest req) {
         ProblemDetail pd = ProblemDetail.forStatus(status);
