@@ -9,15 +9,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class KeycloakAuthoritiesConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
-
-    private final String resourceClientId;
-
-    public KeycloakAuthoritiesConverter(String resourceClientId) {
-        this.resourceClientId = resourceClientId;
-    }
+public record KeycloakAuthoritiesConverter(String resourceClientId) implements Converter<Jwt, Collection<GrantedAuthority>> {
 
     @Override
+    @SuppressWarnings("unchecked")
     public Collection<GrantedAuthority> convert(Jwt jwt) {
         Collection<String> realmRoles = Optional.ofNullable((Map<String, Object>) jwt.getClaim("realm_access"))
                 .map(m -> (Collection<String>) m.getOrDefault("roles", Collections.emptyList()))
